@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="canvas:aspect-ratio" content="16:9" />
+<title>AI 开发工具全景图 — 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --seed-bg: #0a0612;
+  --seed-fg: #e8e0f0;
+  --seed-primary: #9d4edd;
+  --seed-accent: #c77dff;
+  --seed-surface: #141020;
+  --seed-radius: 16px;
+  --bg: var(--seed-bg);
+  --fg: var(--seed-fg);
+  --primary: var(--seed-primary);
+  --accent: var(--seed-accent);
+  --surface: var(--seed-surface);
+  --surface-raised: #1c1630;
+  --muted: #8a7fa0;
+  --muted-dim: #5c5470;
+  --border: rgba(157,78,221,.12);
+  --border-subtle: rgba(157,78,221,.06);
+  --radius: var(--seed-radius);
+  --primary-soft: rgba(157,78,221,.12);
+  --primary-glow: rgba(157,78,221,.25);
+  --accent-soft: rgba(199,125,255,.08);
+  --gold-bg: rgba(234,179,8,.15); --gold-fg: #eab308;
+  --silver-bg: rgba(148,163,184,.1); --silver-fg: #94a3b8;
+  --bronze-bg: rgba(217,119,6,.12); --bronze-fg: #d97706;
+  --success: #22c55e;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', monospace;
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px;--sp-10:40px;--sp-12:48px;--sp-16:64px;--sp-20:80px;
+  --density: 1;
+  --font-size-base: 16px;
+  --mx: 50%; --my: 50%;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-snap-type:y mandatory;overflow-y:scroll;scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-body);font-size:var(--font-size-base);font-weight:400;line-height:1.6;color:var(--fg);background:var(--bg);min-height:100vh;cursor:none}
+
+/* ── Custom Cursor ── */
+.cursor-dot{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:10001;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s}
+.cursor-ring{position:fixed;top:0;left:0;width:36px;height:36px;border:1.5px solid rgba(157,78,221,.4);border-radius:50%;pointer-events:none;z-index:10000;transform:translate(-50%,-50%);transition:width .3s cubic-bezier(.22,1,.36,1),height .3s cubic-bezier(.22,1,.36,1),border-color .3s}
+.cursor-dot.hover{width:14px;height:14px;background:var(--fg)}
+.cursor-ring.hover{width:52px;height:52px;border-color:rgba(199,125,255,.3)}
+@media(pointer:coarse){.cursor-dot,.cursor-ring{display:none}body{cursor:auto}}
+
+/* ── Noise ── */
+body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:256px}
+
+/* ── Snap Sections ── */
+.snap-section{min-height:100vh;scroll-snap-align:start;position:relative;overflow:hidden}
+
+/* ── Nav ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,4vw,56px);background:rgba(10,6,18,.6);backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2);border-bottom:1px solid transparent;transition:border-color .3s,background .3s}
+.nav.scrolled{border-bottom-color:var(--border);background:rgba(10,6,18,.85)}
+.nav-brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:18px;color:var(--fg);text-decoration:none;letter-spacing:-.01em}
+.nav-brand svg{flex-shrink:0;transition:transform .3s}
+.nav-brand:hover svg{transform:rotate(-8deg) scale(1.08)}
+.nav-links{display:flex;gap:8px;align-items:center}
+.nav-link{position:relative;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:400;color:var(--muted);text-decoration:none;letter-spacing:.02em;transition:all .25s;cursor:none}
+.nav-link:hover{color:var(--fg);background:rgba(157,78,221,.06)}
+.nav-link.active{color:var(--accent)}
+.nav-link.active::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:16px;height:2px;border-radius:1px;background:var(--accent)}
+.nav-cta{padding:7px 18px;border-radius:999px;background:rgba(157,78,221,.15);color:var(--accent);font-family:var(--font-body);font-size:13px;font-weight:500;letter-spacing:.02em;border:1px solid rgba(157,78,221,.2);cursor:none;transition:all .25s}
+.nav-cta:hover{background:rgba(157,78,221,.25);border-color:rgba(157,78,221,.35)}
+
+/* ── Side Nav Dots ── */
+.side-nav{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:200;display:flex;flex-direction:column;gap:16px}
+.side-dot{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--muted-dim);background:transparent;cursor:none;transition:all .3s;position:relative}
+.side-dot.active{border-color:var(--accent);background:var(--accent);box-shadow:0 0 12px rgba(157,78,221,.4)}
+.side-dot::before{content:attr(data-label);position:absolute;right:22px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted-dim);white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
+.side-dot:hover::before{opacity:1}
+
+/* ═══════════════════════════════════════
+   HERO SECTION
+   ═══════════════════════════════════════ */
+.hero{display:flex;align-items:center;justify-content:center;text-align:center;background:var(--bg)}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero-glow{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(157,78,221,.12) 0%,transparent 70%);pointer-events:none;z-index:1;animation:glowPulse 8s ease-in-out infinite;will-change:transform,opacity}
+.hero-content{position:relative;z-index:2;max-width:800px;padding:0 24px}
+.hero-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:var(--sp-8);font-family:var(--font-mono);font-size:11px;font-weight:400;color:var(--muted-dim);letter-spacing:.12em;text-transform:uppercase;opacity:0;animation:fadeInUp .8s ease-out .3s forwards}
+.hero-badge .sep{width:24px;height:1px;background:var(--muted-dim);opacity:.4}
+.hero-title{font-family:var(--font-display);font-size:clamp(48px,8vw,96px);font-weight:400;line-height:1;letter-spacing:-.03em;color:var(--fg);margin-bottom:var(--sp-6)}
+.hero-title .char{display:inline-block;opacity:0;transform:translateY(40px) rotateX(-40deg);animation:charReveal .6s cubic-bezier(.22,1,.36,1) forwards}
+.hero-title em{font-style:italic;background:linear-gradient(135deg,var(--accent),var(--primary),var(--accent));background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:charReveal .6s cubic-bezier(.22,1,.36,1) forwards,gradientShift 6s ease-in-out infinite}
+.hero-sub{max-width:520px;margin:0 auto var(--sp-10);font-size:16px;line-height:1.7;font-weight:300;color:var(--muted);opacity:0;animation:fadeInUp .8s ease-out 1.4s forwards}
+.hero-search{max-width:480px;margin:0 auto var(--sp-12);position:relative;opacity:0;animation:fadeInUp .8s ease-out 1.6s forwards}
+.hero-search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted-dim);pointer-events:none}
+.hero-search .kbd{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-family:var(--font-mono);font-size:11px;color:var(--muted-dim);padding:2px 7px;border-radius:4px;background:rgba(157,78,221,.06);border:1px solid var(--border-subtle);pointer-events:none}
+.search-input{width:100%;padding:14px 50px 14px 44px;font-family:var(--font-body);font-size:14px;background:rgba(20,16,32,.8);border:1px solid var(--border);border-radius:14px;color:var(--fg);outline:none;transition:border-color .25s,box-shadow .25s;backdrop-filter:blur(12px);cursor:none}
+.search-input::placeholder{color:var(--muted-dim)}
+.search-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow),0 8px 32px rgba(157,78,221,.15)}
+.hero-stats{display:flex;justify-content:center;gap:clamp(32px,6vw,80px);opacity:0;animation:fadeInUp .8s ease-out 1.8s forwards}
+.stat{text-align:center}
+.stat-num{font-family:var(--font-display);font-size:clamp(32px,5vw,52px);color:var(--fg);letter-spacing:-.02em}
+.stat-label{font-size:12px;color:var(--muted-dim);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+.hero-scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeInUp .8s ease-out 2.2s forwards}
+.hero-scroll-hint span{font-size:11px;color:var(--muted-dim);letter-spacing:.08em;text-transform:uppercase}
+.scroll-arrow{width:20px;height:20px;border-right:1.5px solid var(--muted-dim);border-bottom:1.5px solid var(--muted-dim);transform:rotate(45deg);animation:scrollBounce 2s ease-in-out infinite}
+.hero-credit{position:absolute;bottom:40px;right:clamp(28px,4vw,56px);z-index:2;display:flex;align-items:center;gap:14px;opacity:0;animation:fadeInUp .6s ease-out 2.6s forwards}
+.hero-credit::before{content:'';width:36px;height:2px;background:var(--accent);opacity:.5;border-radius:1px}
+.hero-credit span{font-family:var(--font-mono);font-size:22px;letter-spacing:.02em;color:var(--muted);text-shadow:0 0 20px rgba(157,78,221,.15)}
+.hero-credit .credit-name{color:var(--accent);font-weight:600;text-shadow:0 0 24px rgba(157,78,221,.3)}
+
+/* ═══════════════════════════════════════
+   CATEGORY SECTION
+   ═══════════════════════════════════════ */
+.category-section{display:flex;flex-direction:column;justify-content:center;padding:80px 0 60px;background:var(--bg)}
+.cat-header{padding:0 clamp(20px,4vw,56px);margin-bottom:32px;display:flex;align-items:baseline;gap:14px}
+.cat-header h2{font-family:var(--font-display);font-size:clamp(28px,4vw,40px);font-weight:400;letter-spacing:-.02em;color:var(--fg)}
+.cat-header .cat-count{font-family:var(--font-mono);font-size:12px;color:var(--muted-dim);letter-spacing:.04em}
+.cat-header .cat-line{flex:1;height:1px;background:var(--border-subtle);margin-left:16px}
+
+/* Horizontal Carousel */
+.carousel-wrap{position:relative;flex:1;display:flex;align-items:center}
+.carousel{display:flex;gap:20px;padding:0 clamp(20px,4vw,56px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth;flex:1}
+.carousel::-webkit-scrollbar{display:none}
+.carousel-card{flex:0 0 340px;scroll-snap-align:start;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius);padding:var(--sp-6);transition:transform .4s cubic-bezier(.22,1,.36,1),border-color .3s,box-shadow .4s;position:relative;overflow:hidden;cursor:none;will-change:transform}
+.carousel-card::before{content:'';position:absolute;inset:0;border-radius:var(--radius);background:radial-gradient(circle at var(--mx) var(--my),rgba(157,78,221,.08) 0%,transparent 60%);opacity:0;transition:opacity .4s;pointer-events:none}
+.carousel-card:hover{border-color:rgba(157,78,221,.2);box-shadow:0 24px 64px rgba(157,78,221,.1),0 4px 12px rgba(0,0,0,.4)}
+.carousel-card:hover::before{opacity:1}
+.carousel-card>*{position:relative;z-index:1}
+
+/* Card inner */
+.c-top{display:flex;align-items:center;gap:12px;margin-bottom:var(--sp-4)}
+.c-logo{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:rgba(255,255,255,.95);flex-shrink:0;transition:transform .3s,box-shadow .3s}
+.carousel-card:hover .c-logo{transform:scale(1.08) rotate(-3deg);box-shadow:0 0 20px rgba(157,78,221,.25)}
+.c-meta{flex:1;min-width:0}
+.c-name{font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--fg);line-height:1.3}
+.c-vendor{font-size:12px;color:var(--muted-dim);letter-spacing:.01em}
+.c-rank{padding:3px 9px;border-radius:6px;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.02em;flex-shrink:0}
+.rank-gold{background:var(--gold-bg);color:var(--gold-fg)}
+.rank-silver{background:var(--silver-bg);color:var(--silver-fg)}
+.rank-bronze{background:var(--bronze-bg);color:var(--bronze-fg)}
+.rank-normal{background:rgba(157,78,221,.06);color:var(--muted-dim)}
+.c-rating{display:flex;align-items:center;gap:8px;margin-bottom:var(--sp-3)}
+.rating-bar{flex:1;height:3px;border-radius:2px;background:rgba(157,78,221,.08);overflow:hidden}
+.rating-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--primary),var(--accent));width:0;transition:width 1s cubic-bezier(.22,1,.36,1)}
+.rating-num{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--fg);min-width:28px;text-align:right}
+.c-desc{font-size:13px;line-height:1.6;font-weight:300;color:var(--muted);margin-bottom:var(--sp-4);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.c-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:var(--sp-4)}
+.tag{padding:2px 9px;border-radius:4px;font-family:var(--font-mono);font-size:10px;font-weight:400;letter-spacing:.04em;background:rgba(157,78,221,.06);color:var(--muted);border:1px solid var(--border-subtle)}
+.c-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:var(--sp-3);border-top:1px solid var(--border-subtle)}
+.c-price{font-size:12px;color:var(--muted-dim)}
+.c-price .free{color:var(--success)}
+.c-price .paid{color:var(--muted)}
+.c-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--accent);text-decoration:none;letter-spacing:.01em;transition:gap .25s,color .25s}
+.c-link:hover{gap:8px;color:var(--fg)}
+.c-link svg{width:12px;height:12px}
+
+/* Carousel Arrows */
+.carousel-arrows{display:flex;gap:8px;padding:0 clamp(20px,4vw,56px);margin-top:20px;justify-content:flex-end}
+.arrow-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:rgba(20,16,32,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:none;color:var(--muted);transition:all .25s}
+.arrow-btn:hover{border-color:var(--primary);color:var(--fg);background:rgba(157,78,221,.1)}
+.arrow-btn svg{width:16px;height:16px}
+
+/* ── Compare checkbox ── */
+.c-compare{position:absolute;top:14px;right:14px;z-index:2}
+.compare-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);background:transparent;cursor:none;display:flex;align-items:center;justify-content:center;transition:all .2s;appearance:none;-webkit-appearance:none}
+.compare-check:hover{border-color:var(--primary)}
+.compare-check:checked{background:var(--primary);border-color:var(--primary)}
+.compare-check:checked::after{content:'';width:5px;height:9px;border:1.5px solid var(--bg);border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px)}
+
+/* ═══════════════════════════════════════
+   COMPARE PANEL
+   ═══════════════════════════════════════ */
+.compare-panel{position:fixed;bottom:-100%;left:50%;transform:translateX(-50%);z-index:250;width:min(95vw,860px);background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 -12px 60px rgba(0,0,0,.5),0 0 40px rgba(157,78,221,.08);padding:var(--sp-6);transition:bottom .45s cubic-bezier(.22,1,.36,1)}
+.compare-panel.visible{bottom:24px}
+.compare-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-5)}
+.compare-panel-title{font-family:var(--font-display);font-size:18px;color:var(--fg);letter-spacing:-.01em}
+.compare-close{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:none;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .2s}
+.compare-close:hover{color:var(--fg);border-color:var(--border)}
+.compare-table{width:100%;border-collapse:collapse;font-size:13px}
+.compare-table th{text-align:left;padding:10px 14px;font-weight:400;color:var(--muted-dim);font-size:12px;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid var(--border-subtle)}
+.compare-table td{padding:10px 14px;border-bottom:1px solid var(--border-subtle);color:var(--muted)}
+.compare-table td:first-child{color:var(--muted-dim);font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
+.compare-table a{color:var(--accent);text-decoration:none;transition:color .2s}
+.compare-table a:hover{color:var(--fg)}
+
+/* ── No Results ── */
+.no-results{text-align:center;padding:var(--sp-20) 0;color:var(--muted-dim);font-size:15px;display:none}
+.no-results.show{display:block}
+
+/* ═══════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════ */
+.footer-section{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--bg);border-top:1px solid var(--border-subtle)}
+.footer-brand{font-family:var(--font-display);font-size:20px;color:var(--muted);letter-spacing:0;margin-bottom:var(--sp-4)}
+.footer-section p{max-width:500px;margin:0 auto var(--sp-2);line-height:1.7;color:var(--muted-dim);font-size:12px;letter-spacing:.01em}
+
+/* ── Filters (floating) ── */
+.floating-filters{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:180;display:flex;gap:6px;padding:8px 12px;background:rgba(10,6,18,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.4);transition:opacity .3s,transform .3s}
+.floating-filters.hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(20px)}
+.ff-chip{padding:5px 14px;border-radius:8px;font-size:12px;font-weight:400;letter-spacing:.02em;color:var(--muted);background:transparent;border:1px solid transparent;cursor:none;transition:all .2s;white-space:nowrap}
+.ff-chip:hover{color:var(--fg);background:rgba(157,78,221,.06)}
+.ff-chip.active{color:var(--accent);background:var(--primary-soft);border-color:rgba(157,78,221,.15)}
+.ff-sep{width:1px;background:var(--border);margin:4px 2px}
+.ff-sort{padding:5px 12px;border-radius:8px;font-family:var(--font-body);font-size:12px;color:var(--muted);background:transparent;border:none;cursor:none;outline:none;appearance:none}
+.ff-sort option{background:var(--surface);color:var(--fg)}
+
+/* ═══════════════════════════════════════
+   KEYFRAMES
+   ═══════════════════════════════════════ */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes charReveal{from{opacity:0;transform:translateY(40px) rotateX(-40deg)}to{opacity:1;transform:translateY(0) rotateX(0)}}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes glowPulse{0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}50%{opacity:.5;transform:translate(-50%,-50%) scale(1.15)}}
+@keyframes scrollBounce{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(6px)}}
+
+/* ── Reduced motion ── */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-snap-type:none}.hero-title .char{opacity:1;transform:none}.hero-badge,.hero-sub,.hero-search,.hero-stats,.hero-scroll-hint,.hero-credit{opacity:1;animation:none}body{cursor:auto}.cursor-dot,.cursor-ring{display:none}}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .nav-links{display:none}
+  .side-nav{display:none}
+  .carousel-card{flex:0 0 300px}
+  .hero-stats{gap:24px}
+  .hero-credit{right:50%;transform:translateX(50%);bottom:68px}
+  .floating-filters{width:calc(100% - 32px);overflow-x:auto;justify-content:flex-start}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav class="nav" id="mainNav" data-component="Navigation">
+  <a href="javascript:void(0)" class="nav-brand" onclick="scrollToSection(0)">
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <rect width="26" height="26" rx="7" fill="var(--primary)"/>
+      <path d="M7 13l4-5.5 3.5 5.5L11 18.5z" fill="rgba(255,255,255,.85)"/>
+      <path d="M13 9.5l3.5-1.5v11L13 17z" fill="rgba(255,255,255,.45)"/>
+    </svg>
+    AI Tool Atlas
+  </a>
+  <div class="nav-links" id="navLinks"></div>
+</nav>
+
+<div class="side-nav" id="sideNav"></div>
+
+<div class="floating-filters hidden" id="floatingFilters">
+  <button class="ff-chip active" data-price="all">全部</button>
+  <button class="ff-chip" data-price="free">免费</button>
+  <button class="ff-chip" data-price="freemium">增值</button>
+  <button class="ff-chip" data-price="paid">付费</button>
+  <button class="ff-chip" data-price="open-source">开源</button>
+  <div class="ff-sep"></div>
+  <select class="ff-sort" id="sortSelect">
+    <option value="rating">按评分</option>
+    <option value="name">按名称</option>
+    <option value="price-asc">价格 ↑</option>
+    <option value="price-desc">价格 ↓</option>
+  </select>
+</div>
+
+<!-- HERO -->
+<section class="snap-section hero" id="sec-hero" data-section="0" data-component="Hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-glow"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><span>2026.07</span><span class="sep"></span><span>持续更新</span></div>
+    <h1 class="hero-title" id="heroTitle"></h1>
+    <p class="hero-sub">从代码生成到应用部署，从设计转码到小程序开发。一份面向开发者与产品决策者的全景工具索引。</p>
+    <div class="hero-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="搜索工具、功能或分类..." />
+      <span class="kbd">/</span>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num" id="statTotal" data-target="43">0</div><div class="stat-label">收录工具</div></div>
+      <div class="stat"><div class="stat-num" id="statCats" data-target="7">0</div><div class="stat-label">工具分类</div></div>
+      <div class="stat"><div class="stat-num" id="statFree" data-target="9">0</div><div class="stat-label">免费可用</div></div>
+    </div>
+  </div>
+  <div class="hero-credit"><span>Web开发者：</span><span class="credit-name">韩宇轩</span></div>
+  <div class="hero-scroll-hint"><span>向下滚动</span><div class="scroll-arrow"></div></div>
+</section>
+
+<!-- CATEGORY SECTIONS (generated by JS) -->
+<main id="categorySections" data-component="Main Content"></main>
+<div class="no-results" id="noResults">没有找到匹配的工具，请尝试其他搜索词或筛选条件。</div>
+
+<!-- COMPARE PANEL -->
+<div class="compare-panel" id="comparePanel" data-component="Compare Panel">
+  <div class="compare-panel-header">
+    <div class="compare-panel-title">工具对比</div>
+    <button class="compare-close" id="compareClose">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+  </div>
+  <table class="compare-table" id="compareTable"></table>
+</div>
+
+<!-- FOOTER -->
+<section class="snap-section footer-section" id="sec-footer" data-section="footer" data-component="Footer">
+  <div class="footer-brand">AI Tool Atlas</div>
+  <p>数据来源于各产品官方文档、开发者社区和第三方评测。评分与排名仅供参考。</p>
+  <p style="margin-top:16px;opacity:.6">2026 年 7 月</p>
+</section>
+
+<script>
+/* ═══════════════════════════════════════
+   TOOL DATA
+   ═══════════════════════════════════════ */
+const tools=[
+  {id:'cursor',name:'Cursor',vendor:'Anysphere',category:'code',rating:4.8,desc:'基于 VS Code 的 AI-first 代码编辑器，深度集成多模型代码生成、对话式编程和上下文感知补全。',tags:['代码补全','对话编程','多文件编辑'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#8338ec',url:'https://cursor.com'},
+  {id:'copilot',name:'GitHub Copilot',vendor:'GitHub / Microsoft',category:'code',rating:4.7,desc:'最广泛使用的 AI 编程助手，深度集成于 VS Code 和 JetBrains，支持 Agent 模式和工作区级代码理解。',tags:['代码补全','Agent 模式','多 IDE'],pricing:'freemium',priceLabel:'$10/月起',priceNum:10,color:'#1a7f64',url:'https://github.com/features/copilot'},
+  {id:'windsurf',name:'Windsurf',vendor:'OpenAI',category:'code',rating:4.5,desc:'AI 原生 IDE，Cascade 流式编码体验，将 AI 对话与实时编码深度融合，支持自动运行终端命令。',tags:['流式编码','终端集成','实时预览'],pricing:'freemium',priceLabel:'$15/月起',priceNum:15,color:'#09b6a2',url:'https://windsurf.com'},
+  {id:'tabnine',name:'Tabnine',vendor:'Tabnine',category:'code',rating:4.2,desc:'专注隐私的 AI 代码补全工具，支持本地部署和企业私有云，覆盖所有主流 IDE 和编程语言。',tags:['隐私优先','本地部署','企业级'],pricing:'freemium',priceLabel:'$12/月起',priceNum:12,color:'#5046e5',url:'https://www.tabnine.com'},
+  {id:'amazon-q',name:'Amazon Q Developer',vendor:'AWS',category:'code',rating:4.1,desc:'AWS 原生 AI 开发助手，擅长 AWS 架构代码生成、安全扫描和代码转换。',tags:['AWS 集成','安全扫描','云原生'],pricing:'freemium',priceLabel:'按使用量',priceNum:0,color:'#d4840a',url:'https://aws.amazon.com/q/developer/'},
+  {id:'jetbrains-ai',name:'JetBrains AI',vendor:'JetBrains',category:'code',rating:4.3,desc:'JetBrains 全系 IDE 内置 AI 助手，利用项目索引和类型系统提供精准补全和测试建议。',tags:['JetBrains 原生','项目索引','测试生成'],pricing:'freemium',priceLabel:'含于订阅',priceNum:0,color:'#d94080',url:'https://www.jetbrains.com/ai/'},
+  {id:'sourcegraph',name:'Sourcegraph Cody',vendor:'Sourcegraph',category:'code',rating:4.0,desc:'基于全代码库搜索的 AI 编程助手，能理解跨文件依赖和代码库结构。',tags:['代码搜索','跨文件理解'],pricing:'freemium',priceLabel:'$9/月起',priceNum:9,color:'#5b3af0',url:'https://sourcegraph.com/cody'},
+  {id:'supermaven',name:'Supermaven',vendor:'Supermaven',category:'code',rating:4.3,desc:'极低延迟的 AI 代码补全引擎，百万 token 上下文窗口，精准感知整个代码仓库。',tags:['超低延迟','百万上下文','精准补全'],pricing:'freemium',priceLabel:'$10/月起',priceNum:10,color:'#c46a18',url:'https://supermaven.com'},
+
+  {id:'v0',name:'v0.dev',vendor:'Vercel',category:'website',rating:4.7,desc:'通过自然语言对话生成基于 React、Tailwind CSS 和 shadcn/ui 的高质量前端组件和页面。',tags:['React','Tailwind','shadcn/ui'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#444',url:'https://v0.dev'},
+  {id:'bolt',name:'Bolt.new',vendor:'StackBlitz',category:'website',rating:4.5,desc:'全栈 AI 应用构建器，浏览器沙盒中运行完整开发环境，支持从 prompt 直接生成和部署。',tags:['全栈','浏览器 IDE','即时部署'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#2563eb',url:'https://bolt.new'},
+  {id:'framer-ai',name:'Framer AI',vendor:'Framer',category:'website',rating:4.4,desc:'设计师友好的 AI 网站构建器，支持自定义动画、CMS 和 SEO。',tags:['无代码','动画','CMS'],pricing:'freemium',priceLabel:'$10/月起',priceNum:10,color:'#0055ff',url:'https://www.framer.com'},
+  {id:'durable',name:'Durable AI',vendor:'Durable',category:'website',rating:3.8,desc:'面向中小企业的 AI 网站快速生成器，30 秒内生成包含文案和联系表单的商业网站。',tags:['快速建站','中小企业','CRM'],pricing:'paid',priceLabel:'$12/月起',priceNum:12,color:'#1a8754',url:'https://durable.co'},
+  {id:'10web',name:'10Web',vendor:'10Web',category:'website',rating:3.9,desc:'WordPress 生态的 AI 建站平台，可根据描述或参考 URL 自动生成 WordPress 网站。',tags:['WordPress','URL 克隆'],pricing:'freemium',priceLabel:'$10/月起',priceNum:10,color:'#c23a22',url:'https://10web.io'},
+  {id:'hostinger-ai',name:'Hostinger AI',vendor:'Hostinger',category:'website',rating:3.7,desc:'通过问答式交互快速生成品牌网站，集成 AI 文案生成和 Logo 制作。',tags:['问答建站','AI 文案'],pricing:'paid',priceLabel:'$2.99/月起',priceNum:3,color:'#673de6',url:'https://www.hostinger.com'},
+  {id:'dora-ai',name:'Dora AI',vendor:'Dora',category:'website',rating:4.2,desc:'以 3D 动画和视觉表现力见长的 AI 网站生成器，生成具有三维交互效果的网页。',tags:['3D 动画','交互效果'],pricing:'freemium',priceLabel:'$9/月起',priceNum:9,color:'#c43a3e',url:'https://www.dora.run'},
+
+  {id:'replit-agent',name:'Replit Agent',vendor:'Replit',category:'app',rating:4.5,desc:'AI 全栈开发代理，从自然语言需求出发，自动完成项目搭建、编码、数据库配置和一键部署。',tags:['全栈开发','自动部署','数据库'],pricing:'freemium',priceLabel:'$25/月起',priceNum:25,color:'#d45a0a',url:'https://replit.com'},
+  {id:'lovable',name:'Lovable',vendor:'Lovable',category:'app',rating:4.4,desc:'从自然语言描述生成完整 Web 应用，支持 Supabase 数据库集成和自定义域名部署。',tags:['自然语言','Supabase','域名部署'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#c03888',url:'https://lovable.dev'},
+  {id:'flutterflow',name:'FlutterFlow',vendor:'FlutterFlow',category:'app',rating:4.3,desc:'可视化 Flutter 应用构建平台，集成 AI 辅助生成页面和逻辑，支持发布到 iOS、Android 和 Web。',tags:['Flutter','跨平台','移动应用'],pricing:'freemium',priceLabel:'$30/月起',priceNum:30,color:'#5a52d5',url:'https://flutterflow.io'},
+  {id:'bubble',name:'Bubble',vendor:'Bubble',category:'app',rating:4.1,desc:'成熟的全栈无代码平台，通过可视化编辑器构建复杂 Web 应用逻辑，支持数据库和 API 集成。',tags:['无代码','全栈','API 集成'],pricing:'freemium',priceLabel:'$29/月起',priceNum:29,color:'#1d68d4',url:'https://bubble.io'},
+  {id:'adalo',name:'Adalo',vendor:'Adalo',category:'app',rating:3.8,desc:'面向移动应用的无代码平台，通过拖拽组件构建原生移动 App 并发布到应用商店。',tags:['移动应用','无代码','原生发布'],pricing:'freemium',priceLabel:'$36/月起',priceNum:36,color:'#1a3a6b',url:'https://www.adalo.com'},
+  {id:'glide',name:'Glide',vendor:'Glide',category:'app',rating:4.0,desc:'基于电子表格数据的 AI 应用构建器，将 Google Sheets 或 Excel 数据快速转化为业务应用。',tags:['表格驱动','内部工具'],pricing:'freemium',priceLabel:'$25/月起',priceNum:25,color:'#0ab89a',url:'https://www.glideapps.com'},
+  {id:'expo',name:'Expo',vendor:'Expo',category:'app',rating:4.4,desc:'React Native 开发平台与工具链，提供 AI 辅助代码生成、热更新和应用分发。',tags:['React Native','跨平台','原生应用'],pricing:'freemium',priceLabel:'免费起',priceNum:0,color:'#1a6fb5',url:'https://expo.dev'},
+  {id:'ionic',name:'Ionic',vendor:'Ionic',category:'app',rating:4.0,desc:'基于 Web 技术的跨平台应用开发框架，结合 Capacitor 原生能力构建 iOS 和 Android 应用。',tags:['Web 技术栈','Capacitor','跨平台'],pricing:'freemium',priceLabel:'免费起',priceNum:0,color:'#3880ff',url:'https://ionicframework.com'},
+  {id:'electron',name:'Electron',vendor:'OpenJS Foundation',category:'app',rating:4.2,desc:'使用 HTML、CSS 和 JavaScript 构建跨平台桌面应用的框架，VS Code、Slack 等均基于此开发。',tags:['桌面应用','Web 技术','跨平台'],pricing:'open-source',priceLabel:'免费开源',priceNum:0,color:'#2b2e38',url:'https://www.electronjs.org'},
+
+  {id:'locofy',name:'Locofy',vendor:'Locofy',category:'design',rating:4.3,desc:'将 Figma 设计稿精准转换为 React、Next.js、Vue 等前端代码，AI 辅助识别组件结构。',tags:['Figma 转代码','React','响应式'],pricing:'freemium',priceLabel:'$25/月起',priceNum:25,color:'#6d28d9',url:'https://www.locofy.ai'},
+  {id:'builder-io',name:'Builder.io',vendor:'Builder.io',category:'design',rating:4.2,desc:'Visual Copilot 利用 AI 将 Figma 设计稿转化为框架原生代码，支持 React、Vue、Svelte。',tags:['Figma 转代码','多框架'],pricing:'freemium',priceLabel:'$19/月起',priceNum:19,color:'#c44090',url:'https://www.builder.io'},
+  {id:'anima',name:'Anima',vendor:'Anima',category:'design',rating:3.9,desc:'设计到代码的桥梁，支持从 Figma 和 Adobe XD 导出 React、Vue 和 HTML 代码。',tags:['Figma 导出','Vue','HTML'],pricing:'freemium',priceLabel:'$31/月起',priceNum:31,color:'#5b52e0',url:'https://www.animaapp.com'},
+  {id:'teleportHQ',name:'TeleportHQ',vendor:'TeleportHQ',category:'design',rating:3.8,desc:'AI 驱动的可视化前端开发平台，支持从线框图或草图生成 UI 并导出为多框架代码。',tags:['线框图生成','可视化编辑'],pricing:'freemium',priceLabel:'$15/月起',priceNum:15,color:'#2d6cdf',url:'https://teleporthq.io'},
+  {id:'screenshots',name:'Screenshot to Code',vendor:'Abi (开源)',category:'design',rating:4.0,desc:'开源工具，将任意网页截图或 URL 转化为 HTML/Tailwind/React 代码。',tags:['截图转代码','开源','Tailwind'],pricing:'open-source',priceLabel:'免费开源',priceNum:0,color:'#0f9b72',url:'https://github.com/abi/screenshot-to-code'},
+  {id:'img2code',name:'img2code',vendor:'Macstadium',category:'design',rating:3.7,desc:'基于视觉模型的 UI 图片转代码工具，上传设计图片即可生成结构化的 HTML/CSS 代码。',tags:['图片转代码','CSS 框架'],pricing:'freemium',priceLabel:'$9/月起',priceNum:9,color:'#b8860b',url:'https://img2code.com'},
+
+  {id:'claude',name:'Claude',vendor:'Anthropic',category:'chat',rating:4.9,desc:'Artifacts 功能可在对话中实时生成和预览代码、网页、图表等，Claude Code 提供终端级编程能力。',tags:['Artifacts','Claude Code','终端编程'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#b5654a',url:'https://claude.ai'},
+  {id:'chatgpt',name:'ChatGPT',vendor:'OpenAI',category:'chat',rating:4.7,desc:'Canvas 模式提供代码和文档的协同编辑界面，支持代码生成、调试、数据分析和多模态理解。',tags:['Canvas 模式','多模态','代码执行'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#0e8a6a',url:'https://chat.openai.com'},
+  {id:'gemini',name:'Gemini',vendor:'Google',category:'chat',rating:4.4,desc:'集成于 Google Workspace 生态，支持超长上下文窗口，代码生成和项目管理能力持续增强。',tags:['多模态','超长上下文'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#3a7bd5',url:'https://gemini.google.com'},
+  {id:'deepseek',name:'DeepSeek',vendor:'DeepSeek',category:'chat',rating:4.5,desc:'R1 推理模型在编程和数学推理方面表现突出，支持开源部署，性价比极高。',tags:['推理模型','开源','高性价比'],pricing:'free',priceLabel:'免费',priceNum:0,color:'#3d5fd4',url:'https://chat.deepseek.com'},
+  {id:'qwen',name:'通义千问',vendor:'阿里云',category:'chat',rating:4.3,desc:'通义灵码提供 IDE 插件支持代码生成和补全，Qwen 系列模型开源且性能优异。',tags:['中文优化','通义灵码','开源模型'],pricing:'free',priceLabel:'免费',priceNum:0,color:'#5548c8',url:'https://tongyi.aliyun.com'},
+  {id:'trae',name:'Trae',vendor:'ByteDance',category:'chat',rating:4.2,desc:'基于 VS Code 打造的 AI IDE，内置 Builder 模式可从自然语言生成完整项目。',tags:['AI IDE','Builder 模式','中文优化'],pricing:'free',priceLabel:'免费',priceNum:0,color:'#5a38d8',url:'https://www.trae.ai'},
+
+  {id:'wechat-devtools',name:'微信开发者工具',vendor:'腾讯',category:'miniapp',rating:4.3,desc:'微信小程序官方 IDE，集成代码编辑、调试、云开发和真机预览。',tags:['官方 IDE','调试','云开发'],pricing:'free',priceLabel:'免费',priceNum:0,color:'#07c160',url:'https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html'},
+  {id:'cloudbase',name:'腾讯云开发',vendor:'腾讯',category:'miniapp',rating:4.1,desc:'面向小程序和服务端的 Serverless 开发平台，提供云函数、云数据库、云存储一体化集成。',tags:['Serverless','云函数','云数据库'],pricing:'freemium',priceLabel:'按使用量',priceNum:0,color:'#006eff',url:'https://cloud.tencent.com/product/tcb'},
+  {id:'uniapp',name:'uni-app',vendor:'DCloud',category:'miniapp',rating:4.4,desc:'基于 Vue 的跨平台开发框架，一套代码可编译到微信、支付宝等多个小程序及 iOS、Android。',tags:['跨平台','Vue','多端发布'],pricing:'open-source',priceLabel:'免费开源',priceNum:0,color:'#2b9939',url:'https://uniapp.dcloud.net.cn'},
+  {id:'taro',name:'Taro',vendor:'京东',category:'miniapp',rating:4.2,desc:'京东开源的多端开发框架，支持 React 和 Vue 语法编写小程序。',tags:['多端框架','React','Vue'],pricing:'open-source',priceLabel:'免费开源',priceNum:0,color:'#0068b7',url:'https://taro.jd.com'},
+  {id:'antdev',name:'小程序开发者工具',vendor:'蚂蚁集团',category:'miniapp',rating:3.9,desc:'支付宝小程序官方开发工具，支持蚂蚁生态全链路开发，内置 AI 辅助代码生成。',tags:['支付宝','蚂蚁生态','AI 辅助'],pricing:'free',priceLabel:'免费',priceNum:0,color:'#1677ff',url:'https://opendocs.alipay.com/mini/ide'},
+];
+
+const categories=[
+  {id:'code',label:'代码助手'},
+  {id:'website',label:'网站构建'},
+  {id:'app',label:'应用开发'},
+  {id:'design',label:'设计转码'},
+  {id:'chat',label:'对话编程'},
+  {id:'miniapp',label:'小程序开发'},
+];
+
+/* ═══════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════ */
+let activePrice='all',searchQuery='',sortBy='rating',compareSet=new Set();
+
+/* ═══════════════════════════════════════
+   CUSTOM CURSOR
+   ═══════════════════════════════════════ */
+const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+function animateCursor(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animateCursor)}
+animateCursor();
+document.addEventListener('mouseover',e=>{if(e.target.closest('a,button,input,select,.carousel-card,.arrow-btn,.side-dot,.compare-check')){dot.classList.add('hover');ring.classList.add('hover')}else{dot.classList.remove('hover');ring.classList.remove('hover')}});
+
+/* ═══════════════════════════════════════
+   HERO PARTICLE SYSTEM
+   ═══════════════════════════════════════ */
+class HeroParticles{
+  constructor(c){this.c=c;this.ctx=c.getContext('2d');this.ps=[];this.resize();window.addEventListener('resize',()=>this.resize())}
+  resize(){const h=this.c.parentElement;this.c.width=h.offsetWidth;this.c.height=h.offsetHeight;if(!this.ps.length)this.spawn()}
+  spawn(){const m=window.innerWidth<768;const n=Math.min(Math.floor(this.c.width*this.c.height/12000),m?35:80);this.ps=[];for(let i=0;i<n;i++)this.ps.push({x:Math.random()*this.c.width,y:Math.random()*this.c.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.8+.3,o:Math.random()*.3+.05})}
+  draw(){const{ctx,c}=this;const w=c.width,h=c.height;ctx.clearRect(0,0,w,h);
+    const t=Date.now()*.0003;
+    const g1=ctx.createRadialGradient(w*.3+Math.sin(t)*80,h*.4+Math.cos(t)*60,0,w*.3,h*.4,300);
+    g1.addColorStop(0,'rgba(157,78,221,.04)');g1.addColorStop(1,'transparent');ctx.fillStyle=g1;ctx.fillRect(0,0,w,h);
+    const g2=ctx.createRadialGradient(w*.7+Math.cos(t*1.3)*60,h*.6+Math.sin(t*1.3)*80,0,w*.7,h*.6,250);
+    g2.addColorStop(0,'rgba(199,125,255,.03)');g2.addColorStop(1,'transparent');ctx.fillStyle=g2;ctx.fillRect(0,0,w,h);
+    for(const p of this.ps){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(157,78,221,${p.o})`;ctx.fill()}
+    const md=120;for(let i=0;i<this.ps.length;i++)for(let j=i+1;j<this.ps.length;j++){const dx=this.ps[i].x-this.ps[j].x,dy=this.ps[i].y-this.ps[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<md){ctx.beginPath();ctx.moveTo(this.ps[i].x,this.ps[i].y);ctx.lineTo(this.ps[j].x,this.ps[j].y);ctx.strokeStyle=`rgba(157,78,221,${(1-d/md)*.07})`;ctx.lineWidth=.5;ctx.stroke()}}}
+  start(){const loop=()=>{this.draw();requestAnimationFrame(loop)};loop()}
+}
+
+/* ═══════════════════════════════════════
+   HERO TITLE CHARACTER ANIMATION
+   ═══════════════════════════════════════ */
+function buildHeroTitle(){
+  const el=document.getElementById('heroTitle');
+  const line1='AI 开发工具';
+  const line2='全景图';
+  let html='';let ci=0;
+  for(const ch of line1){html+=`<span class="char" style="animation-delay:${.5+ci*.06}s">${ch}</span>`;ci++}
+  html+='<br>';
+  for(const ch of line2){html+=`<em class="char" style="animation-delay:${.5+ci*.06}s">${ch}</em>`;ci++}
+  el.innerHTML=html;
+}
+
+/* ═══════════════════════════════════════
+   COUNTER ANIMATION
+   ═══════════════════════════════════════ */
+function animateCounters(){
+  setTimeout(()=>{
+    document.querySelectorAll('.stat-num[data-target]').forEach(el=>{
+      const target=parseInt(el.dataset.target),dur=1800,start=performance.now();
+      function up(now){const p=Math.min((now-start)/dur,1);el.textContent=Math.round(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(up)}
+      requestAnimationFrame(up);
+    });
+  },1600);
+}
+
+/* ═══════════════════════════════════════
+   CARD MOUSE TRACKING (3D tilt + glow)
+   ═══════════════════════════════════════ */
+function bindCardEffects(){
+  document.querySelectorAll('.carousel-card').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const x=((e.clientX-r.left)/r.width*100).toFixed(1);
+      const y=((e.clientY-r.top)/r.height*100).toFixed(1);
+      card.style.setProperty('--mx',x+'%');
+      card.style.setProperty('--my',y+'%');
+      const rX=((e.clientY-r.top)/r.height-.5)*-8;
+      const rY=((e.clientX-r.left)/r.width-.5)*8;
+      card.style.transform=`translateY(-6px) perspective(800px) rotateX(${rX}deg) rotateY(${rY}deg) scale(1.01)`;
+    });
+    card.addEventListener('mouseleave',()=>{card.style.transform=''});
+  });
+}
+
+/* ═══════════════════════════════════════
+   RENDER
+   ═══════════════════════════════════════ */
+function getFilteredTools(){
+  return tools.filter(t=>{
+    if(activePrice!=='all'&&t.pricing!==activePrice)return false;
+    if(searchQuery){const q=searchQuery.toLowerCase();return t.name.toLowerCase().includes(q)||t.desc.toLowerCase().includes(q)||t.tags.some(tg=>tg.toLowerCase().includes(q))||t.vendor.toLowerCase().includes(q)}
+    return true;
+  });
+}
+function sortTools(a){const s=[...a];switch(sortBy){case'rating':s.sort((a,b)=>b.rating-a.rating);break;case'name':s.sort((a,b)=>a.name.localeCompare(b.name));break;case'price-asc':s.sort((a,b)=>a.priceNum-b.priceNum);break;case'price-desc':s.sort((a,b)=>b.priceNum-a.priceNum)}return s}
+function getGlobalRank(t){return[...tools].sort((a,b)=>b.rating-a.rating).findIndex(x=>x.id===t.id)+1}
+
+function cardHTML(tool,rank,idx){
+  const rc=rank<=3?(rank===1?'rank-gold':rank===2?'rank-silver':'rank-bronze'):'rank-normal';
+  const ph=tool.pricing==='free'||tool.pricing==='open-source'?`<span class="free">${tool.priceLabel}</span>`:`<span class="paid">${tool.priceLabel}</span>`;
+  return `<div class="carousel-card" data-id="${tool.id}">
+    <label class="c-compare"><input type="checkbox" class="compare-check" data-compare="${tool.id}" ${compareSet.has(tool.id)?'checked':''}/></label>
+    <div class="c-top">
+      <div class="c-logo" style="background:${tool.color}">${tool.name.charAt(0)}</div>
+      <div class="c-meta"><div class="c-name">${tool.name}</div><div class="c-vendor">${tool.vendor}</div></div>
+      <span class="c-rank ${rc}">#${rank}</span>
+    </div>
+    <div class="c-rating"><div class="rating-bar"><div class="rating-fill" data-width="${tool.rating/5*100}"></div></div><span class="rating-num">${tool.rating.toFixed(1)}</span></div>
+    <div class="c-desc">${tool.desc}</div>
+    <div class="c-tags">${tool.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <div class="c-bottom"><div class="c-price">${ph}</div><a href="${tool.url}" target="_blank" rel="noopener" class="c-link">访问<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a></div>
+  </div>`;
+}
+
+function renderAll(){
+  const filtered=getFilteredTools();
+  const container=document.getElementById('categorySections');
+  let html='';let anyResults=false;
+  categories.forEach((cat,ci)=>{
+    const items=sortTools(filtered.filter(t=>t.category===cat.id));
+    if(!items.length)return;
+    anyResults=true;
+    html+=`<section class="snap-section category-section" id="sec-${cat.id}" data-section="${ci+1}">
+      <div class="cat-header"><h2>${cat.label}</h2><span class="cat-count">${items.length} 个工具</span><div class="cat-line"></div></div>
+      <div class="carousel-wrap">
+        <div class="carousel" id="carousel-${cat.id}">${items.map((t,i)=>cardHTML(t,getGlobalRank(t),i)).join('')}</div>
+      </div>
+      <div class="carousel-arrows">
+        <button class="arrow-btn" onclick="scrollCarousel('${cat.id}',-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="arrow-btn" onclick="scrollCarousel('${cat.id}',1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+    </section>`;
+  });
+  container.innerHTML=html;
+  document.getElementById('noResults').classList.toggle('show',!anyResults);
+  bindCardEffects();
+  setTimeout(()=>{document.querySelectorAll('.rating-fill[data-width]').forEach(el=>{el.style.width=el.dataset.width+'%'})},100);
+  buildNavLinks();buildSideNav();initSectionObserver();
+}
+
+function scrollCarousel(catId,dir){
+  const el=document.getElementById('carousel-'+catId);
+  if(el)el.scrollBy({left:dir*380,behavior:'smooth'});
+}
+
+function buildNavLinks(){
+  const nav=document.getElementById('navLinks');
+  nav.innerHTML=categories.map((c,i)=>`<a href="#sec-${c.id}" class="nav-link" data-idx="${i+1}">${c.label}</a>`).join('')+
+    `<button class="nav-cta" onclick="scrollToSection(0)">回到顶部</button>`;
+}
+function buildSideNav(){
+  const sn=document.getElementById('sideNav');
+  sn.innerHTML=`<button class="side-dot active" data-label="首页" onclick="scrollToSection(0)"></button>`+
+    categories.map((c,i)=>`<button class="side-dot" data-label="${c.label}" onclick="scrollToSection(${i+1})"></button>`).join('');
+}
+
+function scrollToSection(idx){
+  const all=document.querySelectorAll('.snap-section');
+  if(idx===0&&all[0])all[0].scrollIntoView({behavior:'smooth'});
+  else if(all[idx])all[idx].scrollIntoView({behavior:'smooth'});
+}
+
+/* ═══════════════════════════════════════
+   SECTION OBSERVER
+   ═══════════════════════════════════════ */
+function initSectionObserver(){
+  const sections=document.querySelectorAll('.snap-section');
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        const idx=e.target.dataset.section;
+        document.querySelectorAll('.side-dot').forEach((d,i)=>d.classList.toggle('active',String(i)===String(idx)));
+        document.querySelectorAll('.nav-link[data-idx]').forEach(l=>l.classList.toggle('active',l.dataset.idx===String(idx)));
+        document.getElementById('floatingFilters').classList.toggle('hidden',idx==='0');
+        document.getElementById('mainNav').classList.toggle('scrolled',idx!=='0');
+        e.target.querySelectorAll('.rating-fill[data-width]').forEach(el=>{el.style.width=el.dataset.width+'%'});
+      }
+    });
+  },{threshold:.5});
+  sections.forEach(s=>obs.observe(s));
+}
+
+/* ═══════════════════════════════════════
+   COMPARE
+   ═══════════════════════════════════════ */
+function updateCompare(){
+  const panel=document.getElementById('comparePanel');
+  if(compareSet.size<2){panel.classList.remove('visible');return}
+  const sel=[...compareSet].map(id=>tools.find(t=>t.id===id)).filter(Boolean);
+  const rows=[['评分',...sel.map(t=>t.rating.toFixed(1)+' / 5')],['开发商',...sel.map(t=>t.vendor)],['分类',...sel.map(t=>categories.find(c=>c.id===t.category)?.label||'')],['定价',...sel.map(t=>t.priceLabel)],['能力',...sel.map(t=>t.tags.slice(0,3).join(' / '))],['官网',...sel.map(t=>`<a href="${t.url}" target="_blank">${t.name}</a>`)]];
+  document.getElementById('compareTable').innerHTML=`<thead><tr><th></th>${sel.map(t=>`<th>${t.name}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  panel.classList.add('visible');
+}
+
+/* ═══════════════════════════════════════
+   EVENTS
+   ═══════════════════════════════════════ */
+function bindEvents(){
+  let db;
+  document.getElementById('searchInput').addEventListener('input',e=>{clearTimeout(db);db=setTimeout(()=>{searchQuery=e.target.value.trim();renderAll()},200)});
+  document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();document.getElementById('searchInput').focus()}});
+  document.getElementById('floatingFilters').addEventListener('click',e=>{const chip=e.target.closest('.ff-chip');if(!chip)return;document.querySelectorAll('.ff-chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');activePrice=chip.dataset.price;renderAll()});
+  document.getElementById('sortSelect').addEventListener('change',e=>{sortBy=e.target.value;renderAll()});
+  document.getElementById('categorySections').addEventListener('change',e=>{if(!e.target.matches('.compare-check'))return;const id=e.target.dataset.compare;if(e.target.checked){if(compareSet.size>=3){e.target.checked=false;return}compareSet.add(id)}else compareSet.delete(id);updateCompare()});
+  document.getElementById('compareClose').addEventListener('click',()=>{compareSet.clear();document.querySelectorAll('.compare-check').forEach(c=>c.checked=false);updateCompare()});
+}
+
+/* ═══════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════ */
+function init(){
+  buildHeroTitle();
+  renderAll();
+  bindEvents();
+  animateCounters();
+  const canvas=document.getElementById('heroCanvas');
+  if(canvas)new HeroParticles(canvas).start();
+}
+document.addEventListener('DOMContentLoaded',init);
+</script>
+</body>
+</html>
