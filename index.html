@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<meta name="canvas:aspect-ratio" content="16:9" />
 <title>AI 开发工具全景图 — 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -80,9 +79,7 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
 .side-dot::before{content:attr(data-label);position:absolute;right:22px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted-dim);white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
 .side-dot:hover::before{opacity:1}
 
-/* ═══════════════════════════════════════
-   HERO SECTION
-   ═══════════════════════════════════════ */
+/* ═══ HERO SECTION ═══ */
 .hero{display:flex;align-items:center;justify-content:center;text-align:center;background:var(--bg)}
 #heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
 .hero-glow{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(157,78,221,.12) 0%,transparent 70%);pointer-events:none;z-index:1;animation:glowPulse 8s ease-in-out infinite;will-change:transform,opacity}
@@ -106,21 +103,23 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
 .hero-scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeInUp .8s ease-out 2.2s forwards}
 .hero-scroll-hint span{font-size:11px;color:var(--muted-dim);letter-spacing:.08em;text-transform:uppercase}
 .scroll-arrow{width:20px;height:20px;border-right:1.5px solid var(--muted-dim);border-bottom:1.5px solid var(--muted-dim);transform:rotate(45deg);animation:scrollBounce 2s ease-in-out infinite}
-.hero-credit{position:absolute;bottom:40px;right:clamp(28px,4vw,56px);z-index:2;display:flex;align-items:center;gap:14px;opacity:0;animation:fadeInUp .6s ease-out 2.6s forwards}
-.hero-credit::before{content:'';width:36px;height:2px;background:var(--accent);opacity:.5;border-radius:1px}
-.hero-credit span{font-family:var(--font-mono);font-size:22px;letter-spacing:.02em;color:var(--muted);text-shadow:0 0 20px rgba(157,78,221,.15)}
-.hero-credit .credit-name{color:var(--accent);font-weight:600;text-shadow:0 0 24px rgba(157,78,221,.3)}
 
-/* ═══════════════════════════════════════
-   CATEGORY SECTION
-   ═══════════════════════════════════════ */
+/* ── Hero Credit (Enhanced) ── */
+.hero-credit{position:absolute;bottom:40px;right:clamp(28px,4vw,56px);z-index:2;display:flex;align-items:center;gap:14px;opacity:0;animation:fadeInUp .6s ease-out 2.6s forwards}
+.hero-credit::before{content:'';width:36px;height:2px;border-radius:1px;transition:background .6s ease}
+.hero-credit .credit-label{font-family:var(--font-mono);font-size:22px;letter-spacing:.02em;transition:color .6s ease}
+.hero-credit .credit-name{font-family:var(--font-mono);font-size:22px;font-weight:600;cursor:none;position:relative;transition:color .6s ease, text-shadow .3s ease}
+.hero-credit .credit-name:hover{text-shadow:0 0 24px currentColor}
+.hero-credit .credit-name::after{content:'点击了解更多';position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%) translateY(4px);font-family:var(--font-body);font-size:11px;font-weight:400;color:var(--muted-dim);white-space:nowrap;opacity:0;transition:all .25s;pointer-events:none;background:var(--surface-raised);padding:4px 10px;border-radius:6px;border:1px solid var(--border)}
+.hero-credit .credit-name:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══ CATEGORY SECTION ═══ */
 .category-section{display:flex;flex-direction:column;justify-content:center;padding:80px 0 60px;background:var(--bg)}
 .cat-header{padding:0 clamp(20px,4vw,56px);margin-bottom:32px;display:flex;align-items:baseline;gap:14px}
 .cat-header h2{font-family:var(--font-display);font-size:clamp(28px,4vw,40px);font-weight:400;letter-spacing:-.02em;color:var(--fg)}
 .cat-header .cat-count{font-family:var(--font-mono);font-size:12px;color:var(--muted-dim);letter-spacing:.04em}
 .cat-header .cat-line{flex:1;height:1px;background:var(--border-subtle);margin-left:16px}
 
-/* Horizontal Carousel */
 .carousel-wrap{position:relative;flex:1;display:flex;align-items:center}
 .carousel{display:flex;gap:20px;padding:0 clamp(20px,4vw,56px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth;flex:1}
 .carousel::-webkit-scrollbar{display:none}
@@ -130,7 +129,6 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
 .carousel-card:hover::before{opacity:1}
 .carousel-card>*{position:relative;z-index:1}
 
-/* Card inner */
 .c-top{display:flex;align-items:center;gap:12px;margin-bottom:var(--sp-4)}
 .c-logo{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:rgba(255,255,255,.95);flex-shrink:0;transition:transform .3s,box-shadow .3s}
 .carousel-card:hover .c-logo{transform:scale(1.08) rotate(-3deg);box-shadow:0 0 20px rgba(157,78,221,.25)}
@@ -157,22 +155,18 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
 .c-link:hover{gap:8px;color:var(--fg)}
 .c-link svg{width:12px;height:12px}
 
-/* Carousel Arrows */
 .carousel-arrows{display:flex;gap:8px;padding:0 clamp(20px,4vw,56px);margin-top:20px;justify-content:flex-end}
 .arrow-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:rgba(20,16,32,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:none;color:var(--muted);transition:all .25s}
 .arrow-btn:hover{border-color:var(--primary);color:var(--fg);background:rgba(157,78,221,.1)}
 .arrow-btn svg{width:16px;height:16px}
 
-/* ── Compare checkbox ── */
 .c-compare{position:absolute;top:14px;right:14px;z-index:2}
 .compare-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);background:transparent;cursor:none;display:flex;align-items:center;justify-content:center;transition:all .2s;appearance:none;-webkit-appearance:none}
 .compare-check:hover{border-color:var(--primary)}
 .compare-check:checked{background:var(--primary);border-color:var(--primary)}
 .compare-check:checked::after{content:'';width:5px;height:9px;border:1.5px solid var(--bg);border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px)}
 
-/* ═══════════════════════════════════════
-   COMPARE PANEL
-   ═══════════════════════════════════════ */
+/* ═══ COMPARE PANEL ═══ */
 .compare-panel{position:fixed;bottom:-100%;left:50%;transform:translateX(-50%);z-index:250;width:min(95vw,860px);background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 -12px 60px rgba(0,0,0,.5),0 0 40px rgba(157,78,221,.08);padding:var(--sp-6);transition:bottom .45s cubic-bezier(.22,1,.36,1)}
 .compare-panel.visible{bottom:24px}
 .compare-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-5)}
@@ -186,13 +180,10 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
 .compare-table a{color:var(--accent);text-decoration:none;transition:color .2s}
 .compare-table a:hover{color:var(--fg)}
 
-/* ── No Results ── */
 .no-results{text-align:center;padding:var(--sp-20) 0;color:var(--muted-dim);font-size:15px;display:none}
 .no-results.show{display:block}
 
-/* ═══════════════════════════════════════
-   FOOTER
-   ═══════════════════════════════════════ */
+/* ═══ FOOTER ═══ */
 .footer-section{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--bg);border-top:1px solid var(--border-subtle)}
 .footer-brand{font-family:var(--font-display);font-size:20px;color:var(--muted);letter-spacing:0;margin-bottom:var(--sp-4)}
 .footer-section p{max-width:500px;margin:0 auto var(--sp-2);line-height:1.7;color:var(--muted-dim);font-size:12px;letter-spacing:.01em}
@@ -207,17 +198,120 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
 .ff-sort{padding:5px 12px;border-radius:8px;font-family:var(--font-body);font-size:12px;color:var(--muted);background:transparent;border:none;cursor:none;outline:none;appearance:none}
 .ff-sort option{background:var(--surface);color:var(--fg)}
 
-/* ═══════════════════════════════════════
-   KEYFRAMES
-   ═══════════════════════════════════════ */
+/* ══════════════════════════════════════════
+   NEW: GLOBAL PARTICLE CANVAS
+   ══════════════════════════════════════════ */
+#particleCanvas{position:fixed;inset:0;z-index:3;pointer-events:none}
+
+/* ══════════════════════════════════════════
+   NEW: AUTHOR INFO PANEL
+   ══════════════════════════════════════════ */
+.author-overlay{position:fixed;inset:0;z-index:500;background:rgba(10,6,18,.7);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .35s ease}
+.author-overlay.open{opacity:1;pointer-events:auto}
+.author-panel{position:fixed;top:50%;left:50%;z-index:501;width:min(440px,90vw);background:linear-gradient(160deg,#1c1630 0%,#141020 100%);border:1px solid rgba(157,78,221,.2);border-radius:20px;padding:0;transform:translate(-50%,-50%) scale(.92);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 60px rgba(157,78,221,.12);overflow:hidden}
+.author-panel.open{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
+.author-panel-header{position:relative;padding:32px 32px 24px;text-align:center;background:linear-gradient(180deg,rgba(157,78,221,.08) 0%,transparent 100%)}
+.author-panel-header h2{font-family:var(--font-display);font-size:28px;font-weight:400;color:var(--fg);letter-spacing:.02em;margin-bottom:4px}
+.author-panel-header .author-subtitle{font-size:12px;color:var(--muted-dim);letter-spacing:.06em}
+.author-panel-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:none;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.author-panel-close:hover{color:var(--fg);border-color:var(--primary);background:rgba(157,78,221,.1)}
+.author-avatar{width:72px;height:72px;border-radius:50%;margin:0 auto 16px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;font-family:var(--font-display);box-shadow:0 0 30px rgba(157,78,221,.3)}
+.author-panel-body{padding:0 32px 32px}
+.author-info-grid{display:flex;flex-direction:column;gap:12px}
+.author-info-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;background:rgba(157,78,221,.04);border:1px solid var(--border-subtle);transition:border-color .2s}
+.author-info-item:hover{border-color:rgba(157,78,221,.15)}
+.author-info-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.author-info-icon.birthday{background:rgba(234,179,8,.1);color:#eab308}
+.author-info-icon.gender{background:rgba(59,130,246,.1);color:#3b82f6}
+.author-info-icon.hobby{background:rgba(34,197,94,.1);color:#22c55e}
+.author-info-text{display:flex;flex-direction:column}
+.author-info-label{font-size:11px;color:var(--muted-dim);letter-spacing:.04em;text-transform:uppercase}
+.author-info-value{font-size:14px;color:var(--fg);font-weight:500}
+.author-panel-footer{padding:0 32px 24px;text-align:center}
+.author-panel-footer p{font-size:12px;color:var(--muted-dim);font-style:italic}
+
+/* ══════════════════════════════════════════
+   NEW: AI CHAT WIDGET
+   ══════════════════════════════════════════ */
+.chat-toggle{position:fixed;bottom:24px;right:24px;z-index:300;width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--primary),#7b2cbf);border:1px solid rgba(199,125,255,.2);cursor:none;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 32px rgba(157,78,221,.3);transition:all .3s ease}
+.chat-toggle:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 12px 40px rgba(157,78,221,.4)}
+.chat-toggle.active{border-radius:50%;background:var(--surface-raised);border-color:var(--border)}
+.chat-toggle svg{transition:transform .3s}
+.chat-toggle.active svg{transform:rotate(180deg)}
+.chat-pulse{position:absolute;inset:-4px;border-radius:20px;border:2px solid var(--accent);opacity:0;animation:chatPulse 2s ease-out infinite}
+.chat-toggle.active .chat-pulse{display:none}
+
+.chat-widget{position:fixed;bottom:88px;right:24px;z-index:300;width:min(400px,calc(100vw - 48px));height:min(560px,calc(100vh - 140px));background:linear-gradient(180deg,#1c1630 0%,#141020 100%);border:1px solid rgba(157,78,221,.15);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.5),0 0 40px rgba(157,78,221,.08);display:flex;flex-direction:column;overflow:hidden;transform:translateY(20px) scale(.95);opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.22,1,.36,1)}
+.chat-widget.open{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
+
+.chat-header{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-subtle);flex-shrink:0}
+.chat-header-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.chat-header-info{flex:1}
+.chat-header-title{font-size:14px;font-weight:600;color:var(--fg)}
+.chat-header-status{font-size:11px;color:var(--success);display:flex;align-items:center;gap:4px}
+.chat-header-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--success)}
+
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:rgba(157,78,221,.2) transparent}
+.chat-messages::-webkit-scrollbar{width:4px}
+.chat-messages::-webkit-scrollbar-thumb{background:rgba(157,78,221,.2);border-radius:2px}
+
+.chat-msg{display:flex;gap:8px;max-width:88%;animation:msgIn .3s ease-out}
+.chat-msg.user{align-self:flex-end;flex-direction:row-reverse}
+.chat-msg-avatar{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px}
+.chat-msg.bot .chat-msg-avatar{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff}
+.chat-msg.user .chat-msg-avatar{background:rgba(157,78,221,.15);color:var(--accent)}
+.chat-msg-bubble{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.6;color:var(--fg)}
+.chat-msg.bot .chat-msg-bubble{background:rgba(157,78,221,.08);border:1px solid var(--border-subtle);border-top-left-radius:4px}
+.chat-msg.user .chat-msg-bubble{background:rgba(157,78,221,.18);border:1px solid rgba(157,78,221,.12);border-top-right-radius:4px}
+.chat-msg-bubble p{margin-bottom:6px}
+.chat-msg-bubble p:last-child{margin-bottom:0}
+.chat-msg-bubble strong{color:var(--accent);font-weight:600}
+.chat-msg-bubble a{color:var(--accent);text-decoration:underline;text-decoration-color:rgba(199,125,255,.3);text-underline-offset:2px;transition:text-decoration-color .2s}
+.chat-msg-bubble a:hover{text-decoration-color:var(--accent)}
+
+/* Code blocks in chat */
+.chat-code-block{position:relative;margin:8px 0;background:#0d0a14;border:1px solid var(--border-subtle);border-radius:10px;overflow:hidden}
+.chat-code-header{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:rgba(157,78,221,.06);border-bottom:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:11px;color:var(--muted-dim)}
+.chat-code-actions{display:flex;gap:4px}
+.chat-code-btn{padding:3px 8px;border-radius:4px;border:1px solid var(--border-subtle);background:transparent;color:var(--muted);font-size:10px;cursor:none;transition:all .2s;font-family:var(--font-body)}
+.chat-code-btn:hover{color:var(--fg);border-color:var(--primary);background:rgba(157,78,221,.1)}
+.chat-code-btn.copied{color:var(--success);border-color:var(--success)}
+.chat-code-body{padding:12px;font-family:var(--font-mono);font-size:12px;line-height:1.6;color:var(--fg);overflow-x:auto;white-space:pre;tab-size:2}
+.chat-code-output{padding:8px 12px;border-top:1px solid var(--border-subtle);font-family:var(--font-mono);font-size:11px;color:var(--success);background:rgba(34,197,94,.04)}
+.chat-code-output.error{color:#ef4444;background:rgba(239,68,68,.04)}
+
+/* Typing indicator */
+.chat-typing{display:flex;align-items:center;gap:4px;padding:10px 14px}
+.chat-typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted-dim);animation:typingDot 1.4s ease-in-out infinite}
+.chat-typing-dot:nth-child(2){animation-delay:.2s}
+.chat-typing-dot:nth-child(3){animation-delay:.4s}
+
+/* Chat input */
+.chat-input-area{padding:12px 16px;border-top:1px solid var(--border-subtle);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;background:rgba(10,6,18,.4)}
+.chat-input{flex:1;min-height:36px;max-height:100px;padding:8px 12px;font-family:var(--font-body);font-size:13px;background:rgba(20,16,32,.8);border:1px solid var(--border);border-radius:10px;color:var(--fg);outline:none;resize:none;line-height:1.5;transition:border-color .2s}
+.chat-input::placeholder{color:var(--muted-dim)}
+.chat-input:focus{border-color:var(--primary)}
+.chat-send{width:36px;height:36px;border-radius:10px;background:var(--primary);border:none;cursor:none;display:flex;align-items:center;justify-content:center;color:#fff;transition:all .2s;flex-shrink:0}
+.chat-send:hover{background:var(--accent);transform:scale(1.05)}
+.chat-send:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+/* Quick suggestions */
+.chat-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px}
+.chat-suggestion{padding:5px 12px;border-radius:8px;font-size:11px;color:var(--muted);background:rgba(157,78,221,.06);border:1px solid var(--border-subtle);cursor:none;transition:all .2s;white-space:nowrap}
+.chat-suggestion:hover{color:var(--accent);border-color:rgba(157,78,221,.2);background:rgba(157,78,221,.1)}
+
+/* ═══ KEYFRAMES ═══ */
 @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @keyframes charReveal{from{opacity:0;transform:translateY(40px) rotateX(-40deg)}to{opacity:1;transform:translateY(0) rotateX(0)}}
 @keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 @keyframes glowPulse{0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}50%{opacity:.5;transform:translate(-50%,-50%) scale(1.15)}}
 @keyframes scrollBounce{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(6px)}}
+@keyframes chatPulse{0%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes typingDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
 
 /* ── Reduced motion ── */
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-snap-type:none}.hero-title .char{opacity:1;transform:none}.hero-badge,.hero-sub,.hero-search,.hero-stats,.hero-scroll-hint,.hero-credit{opacity:1;animation:none}body{cursor:auto}.cursor-dot,.cursor-ring{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-snap-type:none}.hero-title .char{opacity:1;transform:none}.hero-badge,.hero-sub,.hero-search,.hero-stats,.hero-scroll-hint,.hero-credit{opacity:1;animation:none}body{cursor:auto}.cursor-dot,.cursor-ring{display:none}#particleCanvas{display:none}}
 
 /* ── Responsive ── */
 @media(max-width:768px){
@@ -227,6 +321,8 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
   .hero-stats{gap:24px}
   .hero-credit{right:50%;transform:translateX(50%);bottom:68px}
   .floating-filters{width:calc(100% - 32px);overflow-x:auto;justify-content:flex-start}
+  .chat-widget{right:8px;bottom:80px;width:calc(100vw - 16px);height:min(500px,calc(100vh - 120px))}
+  .chat-toggle{right:12px;bottom:12px}
 }
 </style>
 </head>
@@ -234,6 +330,7 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
 
 <div class="cursor-dot" id="cursorDot"></div>
 <div class="cursor-ring" id="cursorRing"></div>
+<canvas id="particleCanvas"></canvas>
 
 <nav class="nav" id="mainNav" data-component="Navigation">
   <a href="javascript:void(0)" class="nav-brand" onclick="scrollToSection(0)">
@@ -283,11 +380,13 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
       <div class="stat"><div class="stat-num" id="statFree" data-target="9">0</div><div class="stat-label">免费可用</div></div>
     </div>
   </div>
-  <div class="hero-credit"><span>Web开发者：</span><span class="credit-name">韩宇轩</span></div>
+  <div class="hero-credit" id="heroCredit">
+    <span class="credit-label">Web开发者：</span>
+    <span class="credit-name" id="creditName" onclick="openAuthorPanel()">韩宇轩</span>
+  </div>
   <div class="hero-scroll-hint"><span>向下滚动</span><div class="scroll-arrow"></div></div>
 </section>
 
-<!-- CATEGORY SECTIONS (generated by JS) -->
 <main id="categorySections" data-component="Main Content"></main>
 <div class="no-results" id="noResults">没有找到匹配的工具，请尝试其他搜索词或筛选条件。</div>
 
@@ -308,6 +407,84 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
   <p>数据来源于各产品官方文档、开发者社区和第三方评测。评分与排名仅供参考。</p>
   <p style="margin-top:16px;opacity:.6">2026 年 7 月</p>
 </section>
+
+<!-- ═══ AUTHOR INFO PANEL ═══ -->
+<div class="author-overlay" id="authorOverlay" onclick="closeAuthorPanel()"></div>
+<div class="author-panel" id="authorPanel">
+  <div class="author-panel-header">
+    <button class="author-panel-close" onclick="closeAuthorPanel()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+    <div class="author-avatar">韩</div>
+    <h2>作者信息</h2>
+    <div class="author-subtitle">WEB DEVELOPER & CREATOR</div>
+  </div>
+  <div class="author-panel-body">
+    <div class="author-info-grid">
+      <div class="author-info-item">
+        <div class="author-info-icon birthday">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></svg>
+        </div>
+        <div class="author-info-text">
+          <span class="author-info-label">出生日期</span>
+          <span class="author-info-value">2006 年 9 月 17 日</span>
+        </div>
+      </div>
+      <div class="author-info-item">
+        <div class="author-info-icon gender">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="5"/><path d="M12 13v8"/><path d="M9 18h6"/></svg>
+        </div>
+        <div class="author-info-text">
+          <span class="author-info-label">性别</span>
+          <span class="author-info-value">男</span>
+        </div>
+      </div>
+      <div class="author-info-item">
+        <div class="author-info-icon hobby">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/></svg>
+        </div>
+        <div class="author-info-text">
+          <span class="author-info-label">业余爱好</span>
+          <span class="author-info-value">电影 / 排球 / 看书</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="author-panel-footer">
+    <p>"用代码创造可能，用设计表达态度。"</p>
+  </div>
+</div>
+
+<!-- ═══ AI CHAT WIDGET ═══ -->
+<button class="chat-toggle" id="chatToggle" onclick="toggleChat()">
+  <span class="chat-pulse"></span>
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" id="chatToggleIcon">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</button>
+
+<div class="chat-widget" id="chatWidget">
+  <div class="chat-header">
+    <div class="chat-header-avatar">AI</div>
+    <div class="chat-header-info">
+      <div class="chat-header-title">AI 工具助手</div>
+      <div class="chat-header-status">在线</div>
+    </div>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-suggestions" id="chatSuggestions">
+    <button class="chat-suggestion" onclick="sendSuggestion(this)">推荐建站工具</button>
+    <button class="chat-suggestion" onclick="sendSuggestion(this)">最好的代码编辑器</button>
+    <button class="chat-suggestion" onclick="sendSuggestion(this)">免费工具有哪些</button>
+    <button class="chat-suggestion" onclick="sendSuggestion(this)">小程序开发推荐</button>
+  </div>
+  <div class="chat-input-area">
+    <textarea class="chat-input" id="chatInput" placeholder="输入你的问题..." rows="1" onkeydown="handleChatKey(event)"></textarea>
+    <button class="chat-send" id="chatSend" onclick="sendChatMessage()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg>
+    </button>
+  </div>
+</div>
 
 <script>
 /* ═══════════════════════════════════════
@@ -371,23 +548,21 @@ const categories=[
   {id:'miniapp',label:'小程序开发'},
 ];
 
-/* ═══════════════════════════════════════
-   STATE
-   ═══════════════════════════════════════ */
+/* ═══ STATE ═══ */
 let activePrice='all',searchQuery='',sortBy='rating',compareSet=new Set();
 
 /* ═══════════════════════════════════════
    CUSTOM CURSOR
    ═══════════════════════════════════════ */
 const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');
-let mx=0,my=0,rx=0,ry=0;
-document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
-function animateCursor(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animateCursor)}
+let cmx=0,cmy=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{cmx=e.clientX;cmy=e.clientY;dot.style.left=cmx+'px';dot.style.top=cmy+'px'});
+function animateCursor(){rx+=(cmx-rx)*.12;ry+=(cmy-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animateCursor)}
 animateCursor();
-document.addEventListener('mouseover',e=>{if(e.target.closest('a,button,input,select,.carousel-card,.arrow-btn,.side-dot,.compare-check')){dot.classList.add('hover');ring.classList.add('hover')}else{dot.classList.remove('hover');ring.classList.remove('hover')}});
+document.addEventListener('mouseover',e=>{if(e.target.closest('a,button,input,textarea,select,.carousel-card,.arrow-btn,.side-dot,.compare-check')){dot.classList.add('hover');ring.classList.add('hover')}else{dot.classList.remove('hover');ring.classList.remove('hover')}});
 
 /* ═══════════════════════════════════════
-   HERO PARTICLE SYSTEM
+   HERO PARTICLE SYSTEM (original)
    ═══════════════════════════════════════ */
 class HeroParticles{
   constructor(c){this.c=c;this.ctx=c.getContext('2d');this.ps=[];this.resize();window.addEventListener('resize',()=>this.resize())}
@@ -403,6 +578,516 @@ class HeroParticles{
     const md=120;for(let i=0;i<this.ps.length;i++)for(let j=i+1;j<this.ps.length;j++){const dx=this.ps[i].x-this.ps[j].x,dy=this.ps[i].y-this.ps[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<md){ctx.beginPath();ctx.moveTo(this.ps[i].x,this.ps[i].y);ctx.lineTo(this.ps[j].x,this.ps[j].y);ctx.strokeStyle=`rgba(157,78,221,${(1-d/md)*.07})`;ctx.lineWidth=.5;ctx.stroke()}}}
   start(){const loop=()=>{this.draw();requestAnimationFrame(loop)};loop()}
 }
+
+/* ═══════════════════════════════════════
+   GLOBAL MOUSE-FOLLOWING PARTICLES
+   ═══════════════════════════════════════ */
+(function(){
+  const canvas=document.getElementById('particleCanvas');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  const mouse={x:-9999,y:-9999,px:-9999,py:-9999,down:false,speed:0};
+  let frame=0;
+  const NUM=45;
+  const particles=[];
+
+  function resize(){
+    W=canvas.width=window.innerWidth;
+    H=canvas.height=window.innerHeight;
+  }
+
+  class P{
+    constructor(){this.reset()}
+    reset(){
+      this.x=Math.random()*W;
+      this.y=Math.random()*H;
+      this.vx=(Math.random()-.5)*.4;
+      this.vy=(Math.random()-.5)*.4;
+      this.r=Math.random()*2.2+.6;
+      this.baseOp=Math.random()*.2+.06;
+      this.op=this.baseOp;
+      this.angle=Math.random()*Math.PI*2;
+      this.orbitR=Math.random()*50+15;
+      this.orbitSpd=(Math.random()*.015+.005)*(Math.random()>.5?1:-1);
+      this.hue=270+Math.random()*40-20;
+    }
+    update(){
+      this.angle+=this.orbitSpd;
+      const dx=mouse.x-this.x;
+      const dy=mouse.y-this.y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      const influence=Math.min(W,H)*.22;
+
+      if(dist<influence&&mouse.x>0){
+        const ratio=dist/influence;
+        // Spiral attraction
+        const pullStr=(1-ratio)*.035;
+        this.vx+=dx*pullStr;
+        this.vy+=dy*pullStr;
+        // Orbital swirl
+        const swirlStr=(1-ratio)*.6;
+        this.vx+=Math.cos(this.angle)*swirlStr;
+        this.vy+=Math.sin(this.angle)*swirlStr;
+        // Glow up near mouse
+        this.op=this.baseOp+(1-ratio)*.35;
+      } else {
+        this.op+=(this.baseOp-this.op)*.04;
+      }
+
+      // Mouse speed push
+      if(mouse.speed>2&&dist<160){
+        const pushStr=(1-dist/160)*.015*mouse.speed;
+        this.vx+=dx*pushStr*.3;
+        this.vy+=dy*pushStr*.3;
+      }
+
+      // Friction
+      this.vx*=.955;
+      this.vy*=.955;
+
+      this.x+=this.vx;
+      this.y+=this.vy;
+
+      // Wrap
+      if(this.x<-60)this.x=W+60;
+      if(this.x>W+60)this.x=-60;
+      if(this.y<-60)this.y=H+60;
+      if(this.y>H+60)this.y=-60;
+    }
+    draw(){
+      ctx.beginPath();
+      ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+      ctx.fillStyle=`hsla(${this.hue},65%,68%,${this.op})`;
+      ctx.fill();
+    }
+  }
+
+  function init(){
+    resize();
+    for(let i=0;i<NUM;i++)particles.push(new P());
+  }
+
+  // Connection lines
+  function drawConnections(){
+    const maxD=100;
+    for(let i=0;i<particles.length;i++){
+      const pi=particles[i];
+      // Only connect particles near the mouse
+      const dm=Math.sqrt((pi.x-mouse.x)**2+(pi.y-mouse.y)**2);
+      if(dm>Math.min(W,H)*.3)continue;
+      for(let j=i+1;j<particles.length;j++){
+        const pj=particles[j];
+        const dx=pi.x-pj.x;
+        const dy=pi.y-pj.y;
+        const d=Math.sqrt(dx*dx+dy*dy);
+        if(d<maxD){
+          const op=(1-d/maxD)*.1;
+          ctx.beginPath();
+          ctx.moveTo(pi.x,pi.y);
+          ctx.lineTo(pj.x,pj.y);
+          ctx.strokeStyle=`hsla(278,60%,65%,${op})`;
+          ctx.lineWidth=.5;
+          ctx.stroke();
+        }
+      }
+    }
+  }
+
+  // Mouse glow
+  function drawGlow(){
+    if(mouse.x<0)return;
+    const t=Date.now()*.001;
+    const pulse=1+Math.sin(t*2)*.15;
+    const grad=ctx.createRadialGradient(mouse.x,mouse.y,0,mouse.x,mouse.y,120*pulse);
+    grad.addColorStop(0,'rgba(157,78,221,.04)');
+    grad.addColorStop(.5,'rgba(199,125,255,.02)');
+    grad.addColorStop(1,'transparent');
+    ctx.fillStyle=grad;
+    ctx.fillRect(mouse.x-150,mouse.y-150,300,300);
+  }
+
+  // Click burst
+  function burst(x,y){
+    for(let i=0;i<6;i++){
+      const p=particles[Math.floor(Math.random()*particles.length)];
+      const a=Math.random()*Math.PI*2;
+      const spd=Math.random()*4+2;
+      p.x=x;
+      p.y=y;
+      p.vx=Math.cos(a)*spd;
+      p.vy=Math.sin(a)*spd;
+      p.op=.5;
+    }
+  }
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    frame++;
+
+    mouse.speed=Math.sqrt((mouse.x-mouse.px)**2+(mouse.y-mouse.py)**2);
+    mouse.px=mouse.x;
+    mouse.py=mouse.y;
+
+    drawGlow();
+    for(const p of particles){p.update();p.draw()}
+    drawConnections();
+
+    requestAnimationFrame(loop);
+  }
+
+  document.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY});
+  document.addEventListener('mousedown',e=>{mouse.down=true;burst(e.clientX,e.clientY)});
+  document.addEventListener('mouseup',()=>{mouse.down=false});
+  document.addEventListener('mouseleave',()=>{mouse.x=-9999;mouse.y=-9999});
+  window.addEventListener('resize',resize);
+
+  init();
+  loop();
+})();
+
+/* ═══════════════════════════════════════
+   SCROLL COLOR CHANGE (Developer Tag)
+   ═══════════════════════════════════════ */
+(function(){
+  const credit=document.getElementById('heroCredit');
+  if(!credit)return;
+  const label=credit.querySelector('.credit-label');
+  const name=credit.querySelector('.credit-name');
+  const bar=getComputedStyle(credit,'::before');
+
+  const colorStops=[
+    {r:199,g:125,b:255},  // accent purple
+    {r:123,g:44,b:191},   // deep purple
+    {r:224,g:170,b:255},  // lavender
+    {r:157,g:78,b:221},   // primary
+    {r:168,g:130,b:255},  // soft violet
+  ];
+
+  function lerpColor(a,b,t){
+    return{r:Math.round(a.r+(b.r-a.r)*t),g:Math.round(a.g+(b.g-a.g)*t),b:Math.round(a.b+(b.b-a.b)*t)};
+  }
+
+  window.addEventListener('scroll',()=>{
+    const scrollY=window.scrollY;
+    const maxScroll=document.documentElement.scrollHeight-window.innerHeight;
+    const progress=Math.min(scrollY/Math.max(maxScroll,1),1);
+
+    const totalSegments=colorStops.length-1;
+    const segProgress=progress*totalSegments;
+    const segIdx=Math.min(Math.floor(segProgress),totalSegments-1);
+    const segT=segProgress-segIdx;
+    const c=lerpColor(colorStops[segIdx],colorStops[segIdx+1],segT);
+    const color=`rgb(${c.r},${c.g},${c.b})`;
+    const glow=`rgba(${c.r},${c.g},${c.b},.35)`;
+
+    if(label)label.style.color=color;
+    if(name)name.style.color=color;
+    if(name)name.style.textShadow=`0 0 20px ${glow}`;
+    credit.style.setProperty('--credit-color',color);
+    // Update the ::before bar via inline style trick
+    const beforeStyle=`background:${color};opacity:.5`;
+    credit.setAttribute('style',`--bar-bg:${color}`);
+  },{passive:true});
+
+  // Add dynamic style for ::before
+  const style=document.createElement('style');
+  style.textContent=`.hero-credit::before{background:var(--bar-bg,var(--accent))!important}`;
+  document.head.appendChild(style);
+})();
+
+/* ═══════════════════════════════════════
+   AUTHOR PANEL
+   ═══════════════════════════════════════ */
+function openAuthorPanel(){
+  document.getElementById('authorOverlay').classList.add('open');
+  document.getElementById('authorPanel').classList.add('open');
+}
+function closeAuthorPanel(){
+  document.getElementById('authorOverlay').classList.remove('open');
+  document.getElementById('authorPanel').classList.remove('open');
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuthorPanel();if(chatOpen)toggleChat()}});
+
+/* ═══════════════════════════════════════
+   AI CHAT WIDGET
+   ═══════════════════════════════════════ */
+let chatOpen=false;
+let chatHistory=[];
+
+function toggleChat(){
+  chatOpen=!chatOpen;
+  document.getElementById('chatWidget').classList.toggle('open',chatOpen);
+  document.getElementById('chatToggle').classList.toggle('active',chatOpen);
+  if(chatOpen&&chatHistory.length===0){
+    addBotMessage('你好！我是 AI 工具助手。告诉我你想做什么，我帮你找到最合适的工具。');
+  }
+  if(chatOpen)document.getElementById('chatInput').focus();
+}
+
+function sendSuggestion(el){
+  document.getElementById('chatInput').value=el.textContent;
+  sendChatMessage();
+}
+
+function handleChatKey(e){
+  if(e.key==='Enter'&&!e.shiftKey){
+    e.preventDefault();
+    sendChatMessage();
+  }
+}
+
+function sendChatMessage(){
+  const input=document.getElementById('chatInput');
+  const text=input.value.trim();
+  if(!text)return;
+  input.value='';
+  input.style.height='auto';
+  addUserMessage(text);
+  showTyping();
+  setTimeout(()=>{
+    removeTyping();
+    const response=generateResponse(text);
+    addBotMessage(response);
+  },600+Math.random()*800);
+}
+
+function addUserMessage(text){
+  const container=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  div.className='chat-msg user';
+  div.innerHTML=`<div class="chat-msg-avatar">你</div><div class="chat-msg-bubble"><p>${escapeHtml(text)}</p></div>`;
+  container.appendChild(div);
+  container.scrollTop=container.scrollHeight;
+  // Hide suggestions after first message
+  document.getElementById('chatSuggestions').style.display='none';
+}
+
+function addBotMessage(html){
+  const container=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  div.className='chat-msg bot';
+  div.innerHTML=`<div class="chat-msg-avatar">AI</div><div class="chat-msg-bubble">${html}</div>`;
+  container.appendChild(div);
+  container.scrollTop=container.scrollHeight;
+  chatHistory.push({role:'bot',content:html});
+  // Bind code button events
+  div.querySelectorAll('.chat-code-btn[data-action="copy"]').forEach(btn=>{
+    btn.onclick=()=>{
+      const code=btn.closest('.chat-code-block').querySelector('.chat-code-body').textContent;
+      navigator.clipboard.writeText(code).then(()=>{
+        btn.textContent='已复制';
+        btn.classList.add('copied');
+        setTimeout(()=>{btn.textContent='复制';btn.classList.remove('copied')},2000);
+      });
+    };
+  });
+  div.querySelectorAll('.chat-code-btn[data-action="run"]').forEach(btn=>{
+    btn.onclick=()=>{
+      const code=btn.closest('.chat-code-block').querySelector('.chat-code-body').textContent;
+      const outputEl=btn.closest('.chat-code-block').querySelector('.chat-code-output');
+      try{
+        const logs=[];
+        const fakeConsole={log:(...a)=>logs.push(a.map(String).join(' ')),error:(...a)=>logs.push('Error: '+a.map(String).join(' '))};
+        const fn=new Function('console',code);
+        const result=fn(fakeConsole);
+        const output=logs.length?logs.join('\n'):(result!==undefined?String(result):'执行完成 (无返回值)');
+        outputEl.textContent=output;
+        outputEl.className='chat-code-output';
+      }catch(err){
+        outputEl.textContent='错误: '+err.message;
+        outputEl.className='chat-code-output error';
+      }
+      outputEl.style.display='block';
+    };
+  });
+}
+
+function showTyping(){
+  const container=document.getElementById('chatMessages');
+  const div=document.createElement('div');
+  div.className='chat-msg bot';
+  div.id='typingIndicator';
+  div.innerHTML=`<div class="chat-msg-avatar">AI</div><div class="chat-typing"><span class="chat-typing-dot"></span><span class="chat-typing-dot"></span><span class="chat-typing-dot"></span></div>`;
+  container.appendChild(div);
+  container.scrollTop=container.scrollHeight;
+}
+function removeTyping(){
+  const el=document.getElementById('typingIndicator');
+  if(el)el.remove();
+}
+
+function escapeHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function codeBlock(lang,code,runnable){
+  const id='code_'+Math.random().toString(36).substr(2,6);
+  const runBtn=runnable?`<button class="chat-code-btn" data-action="run">运行</button>`:'';
+  return `<div class="chat-code-block" id="${id}">
+    <div class="chat-code-header"><span>${lang}</span><div class="chat-code-actions"><button class="chat-code-btn" data-action="copy">复制</button>${runBtn}</div></div>
+    <div class="chat-code-body">${escapeHtml(code)}</div>
+    <div class="chat-code-output" style="display:none"></div>
+  </div>`;
+}
+
+function generateResponse(input){
+  const q=input.toLowerCase();
+
+  // Greeting
+  if(/^(你好|hi|hello|hey|嗨|hey|哈喽)/.test(q)){
+    return '<p>你好！很高兴见到你。我可以帮你：</p><p>- 推荐适合你的 AI 开发工具<br>- 对比不同工具的优劣<br>- 提供代码示例<br>- 解答技术问题</p><p>你想了解什么？</p>';
+  }
+
+  // Website building
+  if(/建站|网站|网页|web|前端|html|css/.test(q)){
+    const topTools=tools.filter(t=>t.category==='website').sort((a,b)=>b.rating-a.rating).slice(0,3);
+    let html='<p>以下是最佳的 AI 建站工具推荐：</p>';
+    topTools.forEach((t,i)=>{
+      html+=`<p><strong>${i+1}. ${t.name}</strong> (${t.rating}分) — ${t.desc.substring(0,60)}... <a href="${t.url}" target="_blank">访问官网</a></p>`;
+    });
+    html+=`<p>如果你需要快速生成前端组件，可以试试这个示例：</p>`;
+    html+=codeBlock('JavaScript',`// 快速创建一个工具筛选函数
+const tools = [
+  { name: "v0.dev", rating: 4.7, type: "React组件生成" },
+  { name: "Bolt.new", rating: 4.5, type: "全栈应用构建" },
+  { name: "Framer AI", rating: 4.4, type: "设计驱动建站" }
+];
+
+const best = tools
+  .filter(t => t.rating >= 4.5)
+  .map(t => t.name + " - " + t.type);
+
+console.log("推荐工具:", best.join(", "));`, true);
+    return html;
+  }
+
+  // Code editors
+  if(/代码|编辑|编程|coding|ide|编辑器|copilot|cursor/.test(q)){
+    const topTools=tools.filter(t=>t.category==='code').sort((a,b)=>b.rating-a.rating).slice(0,4);
+    let html='<p>最推荐的 AI 代码工具：</p>';
+    topTools.forEach((t,i)=>{
+      html+=`<p><strong>${i+1}. ${t.name}</strong> (${t.rating}分) — ${t.desc.substring(0,50)}... <a href="${t.url}" target="_blank">访问</a></p>`;
+    });
+    html+=`<p>Cursor 是目前评分最高的 AI 编辑器，基于 VS Code，支持多模型对话式编程。</p>`;
+    return html;
+  }
+
+  // Apps
+  if(/应用|app|移动|ios|android|跨平台/.test(q)){
+    const topTools=tools.filter(t=>t.category==='app').sort((a,b)=>b.rating-a.rating).slice(0,3);
+    let html='<p>AI 应用开发工具推荐：</p>';
+    topTools.forEach((t,i)=>{
+      html+=`<p><strong>${i+1}. ${t.name}</strong> (${t.rating}分) — ${t.desc.substring(0,50)}... <a href="${t.url}" target="_blank">访问</a></p>`;
+    });
+    html+='<p>FlutterFlow 适合移动端，Replit Agent 适合全栈，Bubble 适合无代码开发。</p>';
+    return html;
+  }
+
+  // Mini programs
+  if(/小程序|微信|wechat|miniprogram/.test(q)){
+    const topTools=tools.filter(t=>t.category==='miniapp').sort((a,b)=>b.rating-a.rating);
+    let html='<p>小程序开发工具推荐：</p>';
+    topTools.forEach((t,i)=>{
+      html+=`<p><strong>${i+1}. ${t.name}</strong> (${t.rating}分) — ${t.desc.substring(0,50)}... <a href="${t.url}" target="_blank">访问</a></p>`;
+    });
+    html+=codeBlock('JavaScript',`// uni-app 跨平台小程序示例
+const pages = [
+  { path: "pages/index/index", name: "首页" },
+  { path: "pages/tools/tools", name: "工具列表" },
+  { path: "pages/about/about", name: "关于" }
+];
+
+console.log("小程序页面数:", pages.length);
+console.log("框架: uni-app (Vue语法, 多端发布)");`, true);
+    return html;
+  }
+
+  // Design to code
+  if(/设计|figma|转码|design|ui/.test(q)){
+    const topTools=tools.filter(t=>t.category==='design').sort((a,b)=>b.rating-a.rating).slice(0,3);
+    let html='<p>设计转码工具推荐：</p>';
+    topTools.forEach((t,i)=>{
+      html+=`<p><strong>${i+1}. ${t.name}</strong> (${t.rating}分) — ${t.desc.substring(0,50)}... <a href="${t.url}" target="_blank">访问</a></p>`;
+    });
+    return html;
+  }
+
+  // Chat/AI assistants
+  if(/对话|聊天|chatgpt|claude|gemini|deepseek|通义/.test(q)){
+    const topTools=tools.filter(t=>t.category==='chat').sort((a,b)=>b.rating-a.rating).slice(0,4);
+    let html='<p>AI 对话编程工具对比：</p>';
+    topTools.forEach((t,i)=>{
+      html+=`<p><strong>${i+1}. ${t.name}</strong> (${t.rating}分, ${t.priceLabel}) — ${t.tags.join(', ')} <a href="${t.url}" target="_blank">访问</a></p>`;
+    });
+    html+='<p>Claude 目前评分最高 (4.9)，Artifacts 功能非常强大。DeepSeek 和通义千问完全免费！</p>';
+    return html;
+  }
+
+  // Free tools
+  if(/免费|free|不要钱|零成本|开源/.test(q)){
+    const freeTools=tools.filter(t=>t.pricing==='free'||t.pricing==='open-source').sort((a,b)=>b.rating-a.rating);
+    let html=`<p>完全免费/开源的工具共 <strong>${freeTools.length}</strong> 个：</p>`;
+    freeTools.forEach(t=>{
+      html+=`<p>- <strong>${t.name}</strong> (${t.priceLabel}) — ${t.tags.join(', ')} <a href="${t.url}" target="_blank">访问</a></p>`;
+    });
+    return html;
+  }
+
+  // Comparison / best / ranking
+  if(/对比|比较|最好|最强|排名|排行|推荐|top/.test(q)){
+    const top5=[...tools].sort((a,b)=>b.rating-a.rating).slice(0,5);
+    let html='<p>全站 Top 5 工具排名：</p>';
+    top5.forEach((t,i)=>{
+      const medal=i===0?'🥇':i===1?'🥈':i===2?'🥉':`#${i+1}`;
+      html+=`<p>${medal} <strong>${t.name}</strong> (${t.rating}分) — ${t.category==='code'?'代码助手':t.category==='website'?'网站构建':t.category==='chat'?'对话编程':t.category} <a href="${t.url}" target="_blank">访问</a></p>`;
+    });
+    return html;
+  }
+
+  // Code example request
+  if(/代码|示例|example|demo|怎么写|how/.test(q)){
+    let html='<p>这里是一个使用 AI 工具辅助开发的示例：</p>';
+    html+=codeBlock('JavaScript',`// 模拟 AI 工具推荐引擎
+class ToolRecommender {
+  constructor(tools) {
+    this.tools = tools;
+  }
+  
+  recommend(need) {
+    const keywords = need.toLowerCase().split(" ");
+    return this.tools
+      .map(tool => ({
+        ...tool,
+        score: keywords.reduce((s, kw) => 
+          s + (tool.tags.some(t => 
+            t.toLowerCase().includes(kw)) ? 1 : 0), 0)
+      }))
+      .filter(t => t.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+  }
+}
+
+const tools = [
+  { name: "Cursor", tags: ["代码补全", "对话编程"] },
+  { name: "v0.dev", tags: ["React", "Tailwind"] },
+  { name: "Claude", tags: ["Artifacts", "终端编程"] }
+];
+
+const rec = new ToolRecommender(tools);
+console.log(JSON.stringify(rec.recommend("代码 编程"), null, 2));`, true);
+    return html;
+  }
+
+  // Default
+  return `<p>我理解你的问题。本站收录了 <strong>43 款</strong> AI 开发工具，分为 6 大类：</p>
+<p>- 代码助手 (8款) — Cursor、Copilot 等<br>- 网站构建 (7款) — v0.dev、Bolt.new 等<br>- 应用开发 (9款) — Replit、FlutterFlow 等<br>- 设计转码 (6款) — Locofy、Builder.io 等<br>- 对话编程 (6款) — Claude、ChatGPT 等<br>- 小程序开发 (5款) — uni-app、Taro 等</p>
+<p>你可以问我具体的需求，比如"推荐免费建站工具"或"最好的代码编辑器是什么"。</p>`;
+}
+
+// Auto-resize chat input
+document.getElementById('chatInput').addEventListener('input',function(){
+  this.style.height='auto';
+  this.style.height=Math.min(this.scrollHeight,100)+'px';
+});
 
 /* ═══════════════════════════════════════
    HERO TITLE CHARACTER ANIMATION
@@ -566,7 +1251,7 @@ function updateCompare(){
 function bindEvents(){
   let db;
   document.getElementById('searchInput').addEventListener('input',e=>{clearTimeout(db);db=setTimeout(()=>{searchQuery=e.target.value.trim();renderAll()},200)});
-  document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();document.getElementById('searchInput').focus()}});
+  document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){e.preventDefault();document.getElementById('searchInput').focus()}});
   document.getElementById('floatingFilters').addEventListener('click',e=>{const chip=e.target.closest('.ff-chip');if(!chip)return;document.querySelectorAll('.ff-chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');activePrice=chip.dataset.price;renderAll()});
   document.getElementById('sortSelect').addEventListener('change',e=>{sortBy=e.target.value;renderAll()});
   document.getElementById('categorySections').addEventListener('change',e=>{if(!e.target.matches('.compare-check'))return;const id=e.target.dataset.compare;if(e.target.checked){if(compareSet.size>=3){e.target.checked=false;return}compareSet.add(id)}else compareSet.delete(id);updateCompare()});
