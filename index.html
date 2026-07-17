@@ -3,239 +3,252 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="canvas:aspect-ratio" content="16:9" />
 <title>AI 开发工具全景图 — 2026</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 <style>
-:root{--bg:#0a0612;--fg:#e8e0f0;--primary:#9d4edd;--accent:#c77dff;--surface:#141020;--surface-raised:#1c1630;--muted:#8a7fa0;--muted-dim:#5c5470;--border:rgba(157,78,221,.12);--border-subtle:rgba(157,78,221,.06);--radius:16px;--primary-soft:rgba(157,78,221,.12);--primary-glow:rgba(157,78,221,.25);--accent-soft:rgba(199,125,255,.08);--gold-bg:rgba(234,179,8,.15);--gold-fg:#eab308;--silver-bg:rgba(148,163,184,.1);--silver-fg:#94a3b8;--bronze-bg:rgba(217,119,6,.12);--bronze-fg:#d97706;--success:#22c55e;--font-display:'DM Serif Display',Georgia,serif;--font-body:'Inter',ui-sans-serif,system-ui,sans-serif;--font-mono:'SF Mono','Fira Code',monospace;--sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px;--sp-10:40px;--sp-12:48px;--sp-16:64px;--sp-20:80px;--mx:50%;--my:50%}
+:root {
+  --seed-bg: #0a0612;
+  --seed-fg: #e8e0f0;
+  --seed-primary: #9d4edd;
+  --seed-accent: #c77dff;
+  --seed-surface: #141020;
+  --seed-radius: 16px;
+  --bg: var(--seed-bg);
+  --fg: var(--seed-fg);
+  --primary: var(--seed-primary);
+  --accent: var(--seed-accent);
+  --surface: var(--seed-surface);
+  --surface-raised: #1c1630;
+  --muted: #8a7fa0;
+  --muted-dim: #5c5470;
+  --border: rgba(157,78,221,.12);
+  --border-subtle: rgba(157,78,221,.06);
+  --radius: var(--seed-radius);
+  --primary-soft: rgba(157,78,221,.12);
+  --primary-glow: rgba(157,78,221,.25);
+  --accent-soft: rgba(199,125,255,.08);
+  --gold-bg: rgba(234,179,8,.15); --gold-fg: #eab308;
+  --silver-bg: rgba(148,163,184,.1); --silver-fg: #94a3b8;
+  --bronze-bg: rgba(217,119,6,.12); --bronze-fg: #d97706;
+  --success: #22c55e;
+  --font-display: 'DM Serif Display', Georgia, serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', monospace;
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px;--sp-10:40px;--sp-12:48px;--sp-16:64px;--sp-20:80px;
+  --density: 1;
+  --font-size-base: 16px;
+  --mx: 50%; --my: 50%;
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-snap-type:y mandatory;overflow-y:scroll;scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-body{font-family:var(--font-body);font-size:16px;line-height:1.6;color:var(--fg);background:var(--bg);min-height:100vh;cursor:none}
+body{font-family:var(--font-body);font-size:var(--font-size-base);font-weight:400;line-height:1.6;color:var(--fg);background:var(--bg);min-height:100vh;cursor:none}
+
+/* ── Custom Cursor ── */
 .cursor-dot{position:fixed;top:0;left:0;width:8px;height:8px;background:var(--accent);border-radius:50%;pointer-events:none;z-index:10001;transform:translate(-50%,-50%);transition:width .2s,height .2s,background .2s}
 .cursor-ring{position:fixed;top:0;left:0;width:36px;height:36px;border:1.5px solid rgba(157,78,221,.4);border-radius:50%;pointer-events:none;z-index:10000;transform:translate(-50%,-50%);transition:width .3s cubic-bezier(.22,1,.36,1),height .3s cubic-bezier(.22,1,.36,1),border-color .3s}
 .cursor-dot.hover{width:14px;height:14px;background:var(--fg)}
 .cursor-ring.hover{width:52px;height:52px;border-color:rgba(199,125,255,.3)}
 @media(pointer:coarse){.cursor-dot,.cursor-ring{display:none}body{cursor:auto}}
+
+/* ── Noise ── */
 body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;opacity:.03;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:256px}
+
+/* ── Snap Sections ── */
 .snap-section{min-height:100vh;scroll-snap-align:start;position:relative;overflow:hidden}
+
+/* ── Nav ── */
 .nav{position:fixed;top:0;left:0;right:0;z-index:200;height:60px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,4vw,56px);background:rgba(10,6,18,.6);backdrop-filter:blur(24px) saturate(1.2);-webkit-backdrop-filter:blur(24px) saturate(1.2);border-bottom:1px solid transparent;transition:border-color .3s,background .3s}
 .nav.scrolled{border-bottom-color:var(--border);background:rgba(10,6,18,.85)}
-.nav-brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:18px;color:var(--fg);text-decoration:none}
-.nav-brand svg{flex-shrink:0;transition:transform .3s}.nav-brand:hover svg{transform:rotate(-8deg) scale(1.08)}
+.nav-brand{display:flex;align-items:center;gap:10px;font-family:var(--font-display);font-size:18px;color:var(--fg);text-decoration:none;letter-spacing:-.01em}
+.nav-brand svg{flex-shrink:0;transition:transform .3s}
+.nav-brand:hover svg{transform:rotate(-8deg) scale(1.08)}
 .nav-links{display:flex;gap:8px;align-items:center}
-.nav-link{position:relative;padding:6px 14px;border-radius:8px;font-size:13px;color:var(--muted);text-decoration:none;transition:all .25s;cursor:none}
+.nav-link{position:relative;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:400;color:var(--muted);text-decoration:none;letter-spacing:.02em;transition:all .25s;cursor:none}
 .nav-link:hover{color:var(--fg);background:rgba(157,78,221,.06)}
 .nav-link.active{color:var(--accent)}
-.nav-link.active::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:16px;height:2px;background:var(--accent)}
-.nav-cta{padding:7px 18px;border-radius:999px;background:rgba(157,78,221,.15);color:var(--accent);font-size:13px;font-weight:500;border:1px solid rgba(157,78,221,.2);cursor:none;transition:all .25s}
-.nav-cta:hover{background:rgba(157,78,221,.25)}
+.nav-link.active::after{content:'';position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:16px;height:2px;border-radius:1px;background:var(--accent)}
+.nav-cta{padding:7px 18px;border-radius:999px;background:rgba(157,78,221,.15);color:var(--accent);font-family:var(--font-body);font-size:13px;font-weight:500;letter-spacing:.02em;border:1px solid rgba(157,78,221,.2);cursor:none;transition:all .25s}
+.nav-cta:hover{background:rgba(157,78,221,.25);border-color:rgba(157,78,221,.35)}
+
+/* ── Side Nav Dots ── */
 .side-nav{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:200;display:flex;flex-direction:column;gap:16px}
 .side-dot{width:10px;height:10px;border-radius:50%;border:1.5px solid var(--muted-dim);background:transparent;cursor:none;transition:all .3s;position:relative}
 .side-dot.active{border-color:var(--accent);background:var(--accent);box-shadow:0 0 12px rgba(157,78,221,.4)}
 .side-dot::before{content:attr(data-label);position:absolute;right:22px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--muted-dim);white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none}
 .side-dot:hover::before{opacity:1}
+
+/* ═══════════════════════════════════════
+   HERO SECTION
+   ═══════════════════════════════════════ */
 .hero{display:flex;align-items:center;justify-content:center;text-align:center;background:var(--bg)}
-#heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
-.hero-glow{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(157,78,221,.12) 0%,transparent 70%);pointer-events:none;z-index:0;animation:glowPulse 8s ease-in-out infinite}
+#heroCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+.hero-glow{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);width:800px;height:600px;background:radial-gradient(ellipse,rgba(157,78,221,.12) 0%,transparent 70%);pointer-events:none;z-index:1;animation:glowPulse 8s ease-in-out infinite;will-change:transform,opacity}
 .hero-content{position:relative;z-index:2;max-width:800px;padding:0 24px}
-.hero-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:var(--sp-8);font-family:var(--font-mono);font-size:11px;color:var(--muted-dim);letter-spacing:.12em;text-transform:uppercase;opacity:0;animation:fadeInUp .8s ease-out .3s forwards}
+.hero-badge{display:inline-flex;align-items:center;gap:10px;margin-bottom:var(--sp-8);font-family:var(--font-mono);font-size:11px;font-weight:400;color:var(--muted-dim);letter-spacing:.12em;text-transform:uppercase;opacity:0;animation:fadeInUp .8s ease-out .3s forwards}
 .hero-badge .sep{width:24px;height:1px;background:var(--muted-dim);opacity:.4}
-.hero-title{font-family:var(--font-display);font-size:clamp(48px,8vw,96px);font-weight:400;line-height:1;letter-spacing:-.03em;color:var(--fg);margin-bottom:var(--sp-6);min-height:1.2em}
-.hero-tagline{font-size:clamp(16px,2.5vw,22px);color:var(--accent);letter-spacing:.15em;font-weight:300;margin-bottom:var(--sp-6);opacity:0;animation:fadeInUp .8s ease-out 1.2s forwards;text-shadow:0 0 30px rgba(199,125,255,.3)}
+.hero-title{font-family:var(--font-display);font-size:clamp(48px,8vw,96px);font-weight:400;line-height:1;letter-spacing:-.03em;color:var(--fg);margin-bottom:var(--sp-6)}
+.hero-title .char{display:inline-block;opacity:0;transform:translateY(40px) rotateX(-40deg);animation:charReveal .6s cubic-bezier(.22,1,.36,1) forwards}
+.hero-title em{font-style:italic;background:linear-gradient(135deg,var(--accent),var(--primary),var(--accent));background-size:200% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:charReveal .6s cubic-bezier(.22,1,.36,1) forwards,gradientShift 6s ease-in-out infinite}
 .hero-sub{max-width:520px;margin:0 auto var(--sp-10);font-size:16px;line-height:1.7;font-weight:300;color:var(--muted);opacity:0;animation:fadeInUp .8s ease-out 1.4s forwards}
 .hero-search{max-width:480px;margin:0 auto var(--sp-12);position:relative;opacity:0;animation:fadeInUp .8s ease-out 1.6s forwards}
 .hero-search svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--muted-dim);pointer-events:none}
 .hero-search .kbd{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-family:var(--font-mono);font-size:11px;color:var(--muted-dim);padding:2px 7px;border-radius:4px;background:rgba(157,78,221,.06);border:1px solid var(--border-subtle);pointer-events:none}
-.search-input{width:100%;padding:14px 50px 14px 44px;font-size:14px;background:rgba(20,16,32,.8);border:1px solid var(--border);border-radius:14px;color:var(--fg);outline:none;transition:border-color .25s,box-shadow .25s;backdrop-filter:blur(12px);cursor:none}
+.search-input{width:100%;padding:14px 50px 14px 44px;font-family:var(--font-body);font-size:14px;background:rgba(20,16,32,.8);border:1px solid var(--border);border-radius:14px;color:var(--fg);outline:none;transition:border-color .25s,box-shadow .25s;backdrop-filter:blur(12px);cursor:none}
 .search-input::placeholder{color:var(--muted-dim)}
 .search-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-glow),0 8px 32px rgba(157,78,221,.15)}
 .hero-stats{display:flex;justify-content:center;gap:clamp(32px,6vw,80px);opacity:0;animation:fadeInUp .8s ease-out 1.8s forwards}
-.stat{text-align:center}.stat-num{font-family:var(--font-display);font-size:clamp(32px,5vw,52px);color:var(--fg)}.stat-label{font-size:12px;color:var(--muted-dim);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
+.stat{text-align:center}
+.stat-num{font-family:var(--font-display);font-size:clamp(32px,5vw,52px);color:var(--fg);letter-spacing:-.02em}
+.stat-label{font-size:12px;color:var(--muted-dim);letter-spacing:.06em;text-transform:uppercase;margin-top:2px}
 .hero-scroll-hint{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:2;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0;animation:fadeInUp .8s ease-out 2.2s forwards}
 .hero-scroll-hint span{font-size:11px;color:var(--muted-dim);letter-spacing:.08em;text-transform:uppercase}
 .scroll-arrow{width:20px;height:20px;border-right:1.5px solid var(--muted-dim);border-bottom:1.5px solid var(--muted-dim);transform:rotate(45deg);animation:scrollBounce 2s ease-in-out infinite}
-.dev-credit{position:absolute;bottom:40px;left:clamp(28px,4vw,56px);z-index:5;display:flex;align-items:center;gap:14px;opacity:0;animation:fadeInUp .6s ease-out 2.6s forwards}
-.dev-credit::before{content:'';width:36px;height:2px;border-radius:1px;background:var(--accent);opacity:.5}
-.dev-credit .credit-label{font-family:var(--font-mono);font-size:22px;letter-spacing:.02em;color:var(--accent);transition:color .6s}
-.dev-credit .credit-name{font-family:var(--font-mono);font-size:22px;font-weight:600;cursor:none;position:relative;color:var(--accent);transition:color .6s,text-shadow .3s}
-.dev-credit .credit-name:hover{text-shadow:0 0 24px currentColor}
-.dev-credit .credit-name::after{content:'点击了解更多';position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%) translateY(4px);font-family:var(--font-body);font-size:11px;color:var(--muted-dim);white-space:nowrap;opacity:0;transition:all .25s;pointer-events:none;background:var(--surface-raised);padding:4px 10px;border-radius:6px;border:1px solid var(--border)}
-.dev-credit .credit-name:hover::after{opacity:1;transform:translateX(-50%) translateY(0)}
-.globe-section{min-height:100vh;scroll-snap-align:start;position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(180deg,#0a0612 0%,#060d1a 30%,#071220 70%,#0a0612 100%);overflow:hidden}
-.globe-header{text-align:center;z-index:10;padding-top:80px;position:relative}
-.globe-header h2{font-family:var(--font-display);font-size:clamp(28px,4vw,44px);color:var(--fg);margin-bottom:8px}
-.globe-header p{font-size:14px;color:var(--muted)}
-#globeContainer{width:100%;height:calc(100vh - 160px);position:relative;z-index:5;cursor:grab}
-#globeContainer:active{cursor:grabbing}#globeContainer canvas{display:block}
-.globe-tooltip{position:fixed;z-index:600;padding:8px 14px;border-radius:10px;background:rgba(20,16,32,.92);border:1px solid rgba(157,78,221,.25);backdrop-filter:blur(12px);color:var(--fg);font-size:13px;font-weight:500;pointer-events:none;opacity:0;transition:opacity .15s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.4)}
-.globe-hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);z-index:10;font-size:12px;color:var(--muted-dim);display:flex;align-items:center;gap:8px;opacity:0;animation:fadeInUp .6s ease-out 1s forwards}
-.globe-hint svg{animation:rotateHint 3s linear infinite}
-.tool-overlay{position:fixed;inset:0;z-index:500;background:rgba(10,6,18,.7);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .35s}
-.tool-overlay.open{opacity:1;pointer-events:auto}
-.tool-detail{position:fixed;top:50%;left:50%;z-index:501;width:min(520px,92vw);max-height:85vh;overflow-y:auto;background:linear-gradient(160deg,#1c1630,#141020);border:1px solid rgba(157,78,221,.2);border-radius:20px;transform:translate(-50%,-50%) scale(.92);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 80px rgba(0,0,0,.6)}
-.tool-detail.open{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
-.td-header{position:relative;padding:28px 28px 20px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--border-subtle)}
-.td-logo{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;color:#fff;flex-shrink:0}
-.td-info{flex:1}.td-name{font-family:var(--font-display);font-size:26px;color:var(--fg)}.td-vendor{font-size:13px;color:var(--muted-dim);margin-top:2px}
-.td-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:none;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.td-close:hover{color:var(--fg);border-color:var(--primary);background:rgba(157,78,221,.1)}
-.td-body{padding:24px 28px}
-.td-lang-toggle{display:flex;gap:4px;margin-bottom:20px;background:rgba(157,78,221,.06);border-radius:10px;padding:3px;width:fit-content}
-.td-lang-btn{padding:6px 16px;border-radius:8px;font-size:12px;font-weight:500;color:var(--muted);background:transparent;border:none;cursor:none;transition:all .2s}
-.td-lang-btn.active{background:var(--primary);color:#fff}
-.td-section{margin-bottom:20px}.td-section h3{font-size:13px;font-weight:600;color:var(--muted-dim);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
-.td-desc{font-size:14px;line-height:1.8;color:var(--fg);font-weight:300}
-.td-tags{display:flex;flex-wrap:wrap;gap:6px}
-.td-tag{padding:4px 12px;border-radius:6px;font-family:var(--font-mono);font-size:11px;background:rgba(157,78,221,.08);color:var(--muted);border:1px solid var(--border-subtle)}
-.td-strengths{list-style:none;display:flex;flex-direction:column;gap:8px}
-.td-strengths li{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--fg);line-height:1.6}
-.td-strengths li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);margin-top:8px;flex-shrink:0}
-.td-footer{padding:16px 28px 24px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border-subtle)}
-.td-price{font-size:13px;color:var(--muted-dim)}.td-price .free{color:var(--success)}
-.td-link{display:inline-flex;align-items:center;gap:6px;padding:8px 20px;border-radius:10px;background:var(--primary);color:#fff;text-decoration:none;font-size:13px;font-weight:500;transition:all .25s}
-.td-link:hover{background:var(--accent);transform:translateY(-1px)}
+.hero-credit{position:absolute;bottom:40px;right:clamp(28px,4vw,56px);z-index:2;display:flex;align-items:center;gap:14px;opacity:0;animation:fadeInUp .6s ease-out 2.6s forwards}
+.hero-credit::before{content:'';width:36px;height:2px;background:var(--accent);opacity:.5;border-radius:1px}
+.hero-credit span{font-family:var(--font-mono);font-size:22px;letter-spacing:.02em;color:var(--muted);text-shadow:0 0 20px rgba(157,78,221,.15)}
+.hero-credit .credit-name{color:var(--accent);font-weight:600;text-shadow:0 0 24px rgba(157,78,221,.3)}
+
+/* ═══════════════════════════════════════
+   CATEGORY SECTION
+   ═══════════════════════════════════════ */
 .category-section{display:flex;flex-direction:column;justify-content:center;padding:80px 0 60px;background:var(--bg)}
 .cat-header{padding:0 clamp(20px,4vw,56px);margin-bottom:32px;display:flex;align-items:baseline;gap:14px}
-.cat-header h2{font-family:var(--font-display);font-size:clamp(28px,4vw,40px);color:var(--fg)}
-.cat-header .cat-count{font-family:var(--font-mono);font-size:12px;color:var(--muted-dim)}.cat-header .cat-line{flex:1;height:1px;background:var(--border-subtle);margin-left:16px}
+.cat-header h2{font-family:var(--font-display);font-size:clamp(28px,4vw,40px);font-weight:400;letter-spacing:-.02em;color:var(--fg)}
+.cat-header .cat-count{font-family:var(--font-mono);font-size:12px;color:var(--muted-dim);letter-spacing:.04em}
+.cat-header .cat-line{flex:1;height:1px;background:var(--border-subtle);margin-left:16px}
+
+/* Horizontal Carousel */
 .carousel-wrap{position:relative;flex:1;display:flex;align-items:center}
-.carousel{display:flex;gap:20px;padding:0 clamp(20px,4vw,56px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;scroll-behavior:smooth;flex:1}
+.carousel{display:flex;gap:20px;padding:0 clamp(20px,4vw,56px);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth;flex:1}
 .carousel::-webkit-scrollbar{display:none}
-.carousel-card{flex:0 0 340px;scroll-snap-align:start;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius);padding:var(--sp-6);transition:transform .4s cubic-bezier(.22,1,.36,1),border-color .3s,box-shadow .4s;position:relative;overflow:hidden;cursor:none}
+.carousel-card{flex:0 0 340px;scroll-snap-align:start;background:var(--surface);border:1px solid var(--border-subtle);border-radius:var(--radius);padding:var(--sp-6);transition:transform .4s cubic-bezier(.22,1,.36,1),border-color .3s,box-shadow .4s;position:relative;overflow:hidden;cursor:none;will-change:transform}
 .carousel-card::before{content:'';position:absolute;inset:0;border-radius:var(--radius);background:radial-gradient(circle at var(--mx) var(--my),rgba(157,78,221,.08) 0%,transparent 60%);opacity:0;transition:opacity .4s;pointer-events:none}
 .carousel-card:hover{border-color:rgba(157,78,221,.2);box-shadow:0 24px 64px rgba(157,78,221,.1),0 4px 12px rgba(0,0,0,.4)}
-.carousel-card:hover::before{opacity:1}.carousel-card>*{position:relative;z-index:1}
+.carousel-card:hover::before{opacity:1}
+.carousel-card>*{position:relative;z-index:1}
+
+/* Card inner */
 .c-top{display:flex;align-items:center;gap:12px;margin-bottom:var(--sp-4)}
 .c-logo{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:rgba(255,255,255,.95);flex-shrink:0;transition:transform .3s,box-shadow .3s}
 .carousel-card:hover .c-logo{transform:scale(1.08) rotate(-3deg);box-shadow:0 0 20px rgba(157,78,221,.25)}
-.c-meta{flex:1;min-width:0}.c-name{font-size:17px;font-weight:600;color:var(--fg);line-height:1.3}.c-vendor{font-size:12px;color:var(--muted-dim)}
-.c-rank{padding:3px 9px;border-radius:6px;font-family:var(--font-mono);font-size:11px;font-weight:500;flex-shrink:0}
-.rank-gold{background:var(--gold-bg);color:var(--gold-fg)}.rank-silver{background:var(--silver-bg);color:var(--silver-fg)}.rank-bronze{background:var(--bronze-bg);color:var(--bronze-fg)}.rank-normal{background:rgba(157,78,221,.06);color:var(--muted-dim)}
+.c-meta{flex:1;min-width:0}
+.c-name{font-size:17px;font-weight:600;letter-spacing:-.01em;color:var(--fg);line-height:1.3}
+.c-vendor{font-size:12px;color:var(--muted-dim);letter-spacing:.01em}
+.c-rank{padding:3px 9px;border-radius:6px;font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:.02em;flex-shrink:0}
+.rank-gold{background:var(--gold-bg);color:var(--gold-fg)}
+.rank-silver{background:var(--silver-bg);color:var(--silver-fg)}
+.rank-bronze{background:var(--bronze-bg);color:var(--bronze-fg)}
+.rank-normal{background:rgba(157,78,221,.06);color:var(--muted-dim)}
 .c-rating{display:flex;align-items:center;gap:8px;margin-bottom:var(--sp-3)}
 .rating-bar{flex:1;height:3px;border-radius:2px;background:rgba(157,78,221,.08);overflow:hidden}
 .rating-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--primary),var(--accent));width:0;transition:width 1s cubic-bezier(.22,1,.36,1)}
 .rating-num{font-family:var(--font-mono);font-size:13px;font-weight:500;color:var(--fg);min-width:28px;text-align:right}
 .c-desc{font-size:13px;line-height:1.6;font-weight:300;color:var(--muted);margin-bottom:var(--sp-4);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .c-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:var(--sp-4)}
-.tag{padding:2px 9px;border-radius:4px;font-family:var(--font-mono);font-size:10px;background:rgba(157,78,221,.06);color:var(--muted);border:1px solid var(--border-subtle)}
+.tag{padding:2px 9px;border-radius:4px;font-family:var(--font-mono);font-size:10px;font-weight:400;letter-spacing:.04em;background:rgba(157,78,221,.06);color:var(--muted);border:1px solid var(--border-subtle)}
 .c-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:var(--sp-3);border-top:1px solid var(--border-subtle)}
-.c-price{font-size:12px;color:var(--muted-dim)}.c-price .free{color:var(--success)}.c-price .paid{color:var(--muted)}
-.c-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--accent);text-decoration:none;transition:gap .25s,color .25s}
-.c-link:hover{gap:8px;color:var(--fg)}.c-link svg{width:12px;height:12px}
+.c-price{font-size:12px;color:var(--muted-dim)}
+.c-price .free{color:var(--success)}
+.c-price .paid{color:var(--muted)}
+.c-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;color:var(--accent);text-decoration:none;letter-spacing:.01em;transition:gap .25s,color .25s}
+.c-link:hover{gap:8px;color:var(--fg)}
+.c-link svg{width:12px;height:12px}
+
+/* Carousel Arrows */
 .carousel-arrows{display:flex;gap:8px;padding:0 clamp(20px,4vw,56px);margin-top:20px;justify-content:flex-end}
 .arrow-btn{width:40px;height:40px;border-radius:10px;border:1px solid var(--border);background:rgba(20,16,32,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;cursor:none;color:var(--muted);transition:all .25s}
-.arrow-btn:hover{border-color:var(--primary);color:var(--fg);background:rgba(157,78,221,.1)}.arrow-btn svg{width:16px;height:16px}
+.arrow-btn:hover{border-color:var(--primary);color:var(--fg);background:rgba(157,78,221,.1)}
+.arrow-btn svg{width:16px;height:16px}
+
+/* ── Compare checkbox ── */
 .c-compare{position:absolute;top:14px;right:14px;z-index:2}
 .compare-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);background:transparent;cursor:none;display:flex;align-items:center;justify-content:center;transition:all .2s;appearance:none;-webkit-appearance:none}
-.compare-check:hover{border-color:var(--primary)}.compare-check:checked{background:var(--primary);border-color:var(--primary)}
+.compare-check:hover{border-color:var(--primary)}
+.compare-check:checked{background:var(--primary);border-color:var(--primary)}
 .compare-check:checked::after{content:'';width:5px;height:9px;border:1.5px solid var(--bg);border-top:none;border-left:none;transform:rotate(45deg) translateY(-1px)}
-.compare-panel{position:fixed;bottom:-100%;left:50%;transform:translateX(-50%);z-index:250;width:min(95vw,860px);background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 -12px 60px rgba(0,0,0,.5);padding:var(--sp-6);transition:bottom .45s cubic-bezier(.22,1,.36,1)}
+
+/* ═══════════════════════════════════════
+   COMPARE PANEL
+   ═══════════════════════════════════════ */
+.compare-panel{position:fixed;bottom:-100%;left:50%;transform:translateX(-50%);z-index:250;width:min(95vw,860px);background:var(--surface-raised);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 -12px 60px rgba(0,0,0,.5),0 0 40px rgba(157,78,221,.08);padding:var(--sp-6);transition:bottom .45s cubic-bezier(.22,1,.36,1)}
 .compare-panel.visible{bottom:24px}
 .compare-panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--sp-5)}
-.compare-panel-title{font-family:var(--font-display);font-size:18px;color:var(--fg)}
+.compare-panel-title{font-family:var(--font-display);font-size:18px;color:var(--fg);letter-spacing:-.01em}
 .compare-close{width:30px;height:30px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:none;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:all .2s}
-.compare-close:hover{color:var(--fg)}
+.compare-close:hover{color:var(--fg);border-color:var(--border)}
 .compare-table{width:100%;border-collapse:collapse;font-size:13px}
 .compare-table th{text-align:left;padding:10px 14px;font-weight:400;color:var(--muted-dim);font-size:12px;letter-spacing:.04em;text-transform:uppercase;border-bottom:1px solid var(--border-subtle)}
 .compare-table td{padding:10px 14px;border-bottom:1px solid var(--border-subtle);color:var(--muted)}
 .compare-table td:first-child{color:var(--muted-dim);font-size:11px;font-weight:500;letter-spacing:.04em;text-transform:uppercase}
-.compare-table a{color:var(--accent);text-decoration:none}
-.no-results{text-align:center;padding:var(--sp-20) 0;color:var(--muted-dim);font-size:15px;display:none}.no-results.show{display:block}
+.compare-table a{color:var(--accent);text-decoration:none;transition:color .2s}
+.compare-table a:hover{color:var(--fg)}
+
+/* ── No Results ── */
+.no-results{text-align:center;padding:var(--sp-20) 0;color:var(--muted-dim);font-size:15px;display:none}
+.no-results.show{display:block}
+
+/* ═══════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════ */
 .footer-section{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--bg);border-top:1px solid var(--border-subtle)}
-.footer-brand{font-family:var(--font-display);font-size:20px;color:var(--muted);margin-bottom:var(--sp-4)}
-.footer-section p{max-width:500px;margin:0 auto var(--sp-2);line-height:1.7;color:var(--muted-dim);font-size:12px}
+.footer-brand{font-family:var(--font-display);font-size:20px;color:var(--muted);letter-spacing:0;margin-bottom:var(--sp-4)}
+.footer-section p{max-width:500px;margin:0 auto var(--sp-2);line-height:1.7;color:var(--muted-dim);font-size:12px;letter-spacing:.01em}
+
+/* ── Filters (floating) ── */
 .floating-filters{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:180;display:flex;gap:6px;padding:8px 12px;background:rgba(10,6,18,.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 40px rgba(0,0,0,.4);transition:opacity .3s,transform .3s}
 .floating-filters.hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(20px)}
-.ff-chip{padding:5px 14px;border-radius:8px;font-size:12px;color:var(--muted);background:transparent;border:1px solid transparent;cursor:none;transition:all .2s;white-space:nowrap}
-.ff-chip:hover{color:var(--fg);background:rgba(157,78,221,.06)}.ff-chip.active{color:var(--accent);background:var(--primary-soft);border-color:rgba(157,78,221,.15)}
+.ff-chip{padding:5px 14px;border-radius:8px;font-size:12px;font-weight:400;letter-spacing:.02em;color:var(--muted);background:transparent;border:1px solid transparent;cursor:none;transition:all .2s;white-space:nowrap}
+.ff-chip:hover{color:var(--fg);background:rgba(157,78,221,.06)}
+.ff-chip.active{color:var(--accent);background:var(--primary-soft);border-color:rgba(157,78,221,.15)}
 .ff-sep{width:1px;background:var(--border);margin:4px 2px}
-.ff-sort{padding:5px 12px;border-radius:8px;font-size:12px;color:var(--muted);background:transparent;border:none;cursor:none;outline:none;appearance:none}
+.ff-sort{padding:5px 12px;border-radius:8px;font-family:var(--font-body);font-size:12px;color:var(--muted);background:transparent;border:none;cursor:none;outline:none;appearance:none}
 .ff-sort option{background:var(--surface);color:var(--fg)}
-#particleCanvas{position:fixed;inset:0;z-index:3;pointer-events:none}
-.author-overlay{position:fixed;inset:0;z-index:500;background:rgba(10,6,18,.7);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .35s}
-.author-overlay.open{opacity:1;pointer-events:auto}
-.author-panel{position:fixed;top:50%;left:50%;z-index:501;width:min(440px,90vw);background:linear-gradient(160deg,#1c1630,#141020);border:1px solid rgba(157,78,221,.2);border-radius:20px;transform:translate(-50%,-50%) scale(.92);opacity:0;pointer-events:none;transition:all .4s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 80px rgba(0,0,0,.6),0 0 60px rgba(157,78,221,.12);overflow:hidden}
-.author-panel.open{transform:translate(-50%,-50%) scale(1);opacity:1;pointer-events:auto}
-.author-panel-header{position:relative;padding:32px 32px 24px;text-align:center;background:linear-gradient(180deg,rgba(157,78,221,.08) 0%,transparent 100%)}
-.author-panel-header h2{font-family:var(--font-display);font-size:28px;color:var(--fg)}
-.ap-subtitle{font-size:12px;color:var(--muted-dim);letter-spacing:.06em}
-.ap-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:0 32px}
-.author-panel-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);cursor:none;display:flex;align-items:center;justify-content:center;transition:all .2s}
-.author-panel-close:hover{color:var(--fg);border-color:var(--primary);background:rgba(157,78,221,.1)}
-.author-panel-body{padding:20px 32px 32px}
-.author-info-grid{display:flex;flex-direction:column;gap:12px}
-.author-info-item{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:12px;background:rgba(157,78,221,.04);border:1px solid var(--border-subtle);transition:border-color .2s}
-.author-info-item:hover{border-color:rgba(157,78,221,.15)}
-.author-info-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.author-info-icon.birthday{background:rgba(234,179,8,.1);color:#eab308}
-.author-info-icon.gender{background:rgba(59,130,246,.1);color:#3b82f6}
-.author-info-icon.hobby{background:rgba(34,197,94,.1);color:#22c55e}
-.author-info-text{display:flex;flex-direction:column}
-.author-info-label{font-size:11px;color:var(--muted-dim);letter-spacing:.04em;text-transform:uppercase}
-.author-info-value{font-size:14px;color:var(--fg);font-weight:500}
-.author-panel-footer{padding:0 32px 24px;text-align:center}
-.author-panel-footer p{font-size:12px;color:var(--muted-dim);font-style:italic}
-.chat-toggle{position:fixed;bottom:24px;right:24px;z-index:300;width:52px;height:52px;border-radius:16px;background:linear-gradient(135deg,var(--primary),#7b2cbf);border:1px solid rgba(199,125,255,.2);cursor:none;display:flex;align-items:center;justify-content:center;color:#fff;box-shadow:0 8px 32px rgba(157,78,221,.3);transition:all .3s}
-.chat-toggle:hover{transform:translateY(-2px) scale(1.05);box-shadow:0 12px 40px rgba(157,78,221,.4)}
-.chat-toggle.active{border-radius:50%;background:var(--surface-raised);border-color:var(--border)}
-.chat-toggle svg{transition:transform .3s}.chat-toggle.active svg{transform:rotate(180deg)}
-.chat-pulse{position:absolute;inset:-4px;border-radius:20px;border:2px solid var(--accent);opacity:0;animation:chatPulse 2s ease-out infinite}
-.chat-toggle.active .chat-pulse{display:none}
-.chat-widget{position:fixed;bottom:88px;right:24px;z-index:300;width:min(400px,calc(100vw - 48px));height:min(560px,calc(100vh - 140px));background:linear-gradient(180deg,#1c1630,#141020);border:1px solid rgba(157,78,221,.15);border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.5);display:flex;flex-direction:column;overflow:hidden;transform:translateY(20px) scale(.95);opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.22,1,.36,1)}
-.chat-widget.open{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
-.chat-header{padding:16px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--border-subtle)}
-.chat-header-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--accent));display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
-.chat-header-info{flex:1}.chat-header-title{font-size:14px;font-weight:600;color:var(--fg)}
-.chat-header-status{font-size:11px;color:var(--success);display:flex;align-items:center;gap:4px}
-.chat-header-status::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--success)}
-.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:rgba(157,78,221,.2) transparent}
-.chat-messages::-webkit-scrollbar{width:4px}.chat-messages::-webkit-scrollbar-thumb{background:rgba(157,78,221,.2);border-radius:2px}
-.chat-msg{display:flex;gap:8px;max-width:88%;animation:msgIn .3s ease-out}
-.chat-msg.user{align-self:flex-end;flex-direction:row-reverse}
-.chat-msg-avatar{width:28px;height:28px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px}
-.chat-msg.bot .chat-msg-avatar{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff}
-.chat-msg.user .chat-msg-avatar{background:rgba(157,78,221,.15);color:var(--accent)}
-.chat-msg-bubble{padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.6;color:var(--fg)}
-.chat-msg.bot .chat-msg-bubble{background:rgba(157,78,221,.08);border:1px solid var(--border-subtle);border-top-left-radius:4px}
-.chat-msg.user .chat-msg-bubble{background:rgba(157,78,221,.18);border:1px solid rgba(157,78,221,.12);border-top-right-radius:4px}
-.chat-msg-bubble p{margin-bottom:6px}.chat-msg-bubble p:last-child{margin-bottom:0}
-.chat-msg-bubble strong{color:var(--accent);font-weight:600}
-.chat-msg-bubble a{color:var(--accent);text-decoration:underline;text-decoration-color:rgba(199,125,255,.3);text-underline-offset:2px}
-.chat-typing{display:flex;align-items:center;gap:4px;padding:10px 14px}
-.chat-typing-dot{width:6px;height:6px;border-radius:50%;background:var(--muted-dim);animation:typingDot 1.4s ease-in-out infinite}
-.chat-typing-dot:nth-child(2){animation-delay:.2s}.chat-typing-dot:nth-child(3){animation-delay:.4s}
-.chat-input-area{padding:12px 16px;border-top:1px solid var(--border-subtle);display:flex;gap:8px;align-items:flex-end;background:rgba(10,6,18,.4)}
-.chat-input{flex:1;min-height:36px;max-height:100px;padding:8px 12px;font-size:13px;background:rgba(20,16,32,.8);border:1px solid var(--border);border-radius:10px;color:var(--fg);outline:none;resize:none;line-height:1.5;transition:border-color .2s}
-.chat-input::placeholder{color:var(--muted-dim)}.chat-input:focus{border-color:var(--primary)}
-.chat-send{width:36px;height:36px;border-radius:10px;background:var(--primary);border:none;cursor:none;display:flex;align-items:center;justify-content:center;color:#fff;transition:all .2s;flex-shrink:0}
-.chat-send:hover{background:var(--accent);transform:scale(1.05)}
-.chat-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 12px}
-.chat-suggestion{padding:5px 12px;border-radius:8px;font-size:11px;color:var(--muted);background:rgba(157,78,221,.06);border:1px solid var(--border-subtle);cursor:none;transition:all .2s;white-space:nowrap}
-.chat-suggestion:hover{color:var(--accent);border-color:rgba(157,78,221,.2)}
+
+/* ═══════════════════════════════════════
+   KEYFRAMES
+   ═══════════════════════════════════════ */
 @keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes charReveal{from{opacity:0;transform:translateY(40px) rotateX(-40deg)}to{opacity:1;transform:translateY(0) rotateX(0)}}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 @keyframes glowPulse{0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}50%{opacity:.5;transform:translate(-50%,-50%) scale(1.15)}}
 @keyframes scrollBounce{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(6px)}}
-@keyframes chatPulse{0%{opacity:.6;transform:scale(1)}100%{opacity:0;transform:scale(1.5)}}
-@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-@keyframes typingDot{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
-@keyframes rotateHint{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-@media(max-width:768px){.nav-links{display:none}.side-nav{display:none}.carousel-card{flex:0 0 300px}.hero-stats{gap:24px}.dev-credit{left:50%;transform:translateX(50%);bottom:68px}.floating-filters{width:calc(100% - 32px);overflow-x:auto}.chat-widget{right:8px;bottom:80px;width:calc(100vw - 16px);height:min(500px,calc(100vh - 120px))}.chat-toggle{right:12px;bottom:12px}.globe-header{padding-top:70px}}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}html{scroll-snap-type:none}body{cursor:auto}.cursor-dot,.cursor-ring{display:none}#particleCanvas{display:none}}
+
+/* ── Reduced motion ── */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}html{scroll-snap-type:none}.hero-title .char{opacity:1;transform:none}.hero-badge,.hero-sub,.hero-search,.hero-stats,.hero-scroll-hint,.hero-credit{opacity:1;animation:none}body{cursor:auto}.cursor-dot,.cursor-ring{display:none}}
+
+/* ── Responsive ── */
+@media(max-width:768px){
+  .nav-links{display:none}
+  .side-nav{display:none}
+  .carousel-card{flex:0 0 300px}
+  .hero-stats{gap:24px}
+  .hero-credit{right:50%;transform:translateX(50%);bottom:68px}
+  .floating-filters{width:calc(100% - 32px);overflow-x:auto;justify-content:flex-start}
+}
 </style>
 </head>
 <body>
+
 <div class="cursor-dot" id="cursorDot"></div>
 <div class="cursor-ring" id="cursorRing"></div>
-<canvas id="particleCanvas"></canvas>
-<nav class="nav" id="mainNav">
+
+<nav class="nav" id="mainNav" data-component="Navigation">
   <a href="javascript:void(0)" class="nav-brand" onclick="scrollToSection(0)">
-    <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><rect width="26" height="26" rx="7" fill="var(--primary)"/><path d="M7 13l4-5.5 3.5 5.5L11 18.5z" fill="rgba(255,255,255,.85)"/><path d="M13 9.5l3.5-1.5v11L13 17z" fill="rgba(255,255,255,.45)"/></svg>
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
+      <rect width="26" height="26" rx="7" fill="var(--primary)"/>
+      <path d="M7 13l4-5.5 3.5 5.5L11 18.5z" fill="rgba(255,255,255,.85)"/>
+      <path d="M13 9.5l3.5-1.5v11L13 17z" fill="rgba(255,255,255,.45)"/>
+    </svg>
     AI Tool Atlas
   </a>
   <div class="nav-links" id="navLinks"></div>
 </nav>
+
 <div class="side-nav" id="sideNav"></div>
+
 <div class="floating-filters hidden" id="floatingFilters">
   <button class="ff-chip active" data-price="all">全部</button>
   <button class="ff-chip" data-price="free">免费</button>
@@ -243,15 +256,21 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
   <button class="ff-chip" data-price="paid">付费</button>
   <button class="ff-chip" data-price="open-source">开源</button>
   <div class="ff-sep"></div>
-  <select class="ff-sort" id="sortSelect"><option value="rating">按评分</option><option value="name">按名称</option><option value="price-asc">价格 ↑</option><option value="price-desc">价格 ↓</option></select>
+  <select class="ff-sort" id="sortSelect">
+    <option value="rating">按评分</option>
+    <option value="name">按名称</option>
+    <option value="price-asc">价格 ↑</option>
+    <option value="price-desc">价格 ↓</option>
+  </select>
 </div>
-<section class="snap-section hero" id="sec-hero" data-section="0">
+
+<!-- HERO -->
+<section class="snap-section hero" id="sec-hero" data-section="0" data-component="Hero">
   <canvas id="heroCanvas"></canvas>
   <div class="hero-glow"></div>
   <div class="hero-content">
     <div class="hero-badge"><span>2026.07</span><span class="sep"></span><span>持续更新</span></div>
     <h1 class="hero-title" id="heroTitle"></h1>
-    <div class="hero-tagline">与您携手创造未来</div>
     <p class="hero-sub">从代码生成到应用部署，从设计转码到小程序开发。一份面向开发者与产品决策者的全景工具索引。</p>
     <div class="hero-search">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
@@ -264,290 +283,254 @@ body::after{content:'';position:fixed;inset:0;z-index:10000;pointer-events:none;
       <div class="stat"><div class="stat-num" id="statFree" data-target="9">0</div><div class="stat-label">免费可用</div></div>
     </div>
   </div>
-  <div class="dev-credit" id="devCredit"><span class="credit-label">Web开发者：</span><span class="credit-name" id="creditName" onclick="openAuthorPanel()">韩宇轩</span></div>
+  <div class="hero-credit"><span>Web开发者：</span><span class="credit-name">韩宇轩</span></div>
   <div class="hero-scroll-hint"><span>向下滚动</span><div class="scroll-arrow"></div></div>
 </section>
-<section class="globe-section" id="sec-globe" data-section="globe">
-  <div class="globe-header"><h2>全球 AI 工具分布</h2><p>拖拽旋转地球 · 点击标记查看工具详情</p></div>
-  <div id="globeContainer"></div>
-  <div class="globe-hint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="16" height="16"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v6h-6"/></svg>拖拽旋转地球</div>
-</section>
-<div class="globe-tooltip" id="globeTooltip"></div>
-<main id="categorySections"></main>
+
+<!-- CATEGORY SECTIONS (generated by JS) -->
+<main id="categorySections" data-component="Main Content"></main>
 <div class="no-results" id="noResults">没有找到匹配的工具，请尝试其他搜索词或筛选条件。</div>
-<div class="compare-panel" id="comparePanel">
-  <div class="compare-panel-header"><div class="compare-panel-title">工具对比</div><button class="compare-close" id="compareClose"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>
+
+<!-- COMPARE PANEL -->
+<div class="compare-panel" id="comparePanel" data-component="Compare Panel">
+  <div class="compare-panel-header">
+    <div class="compare-panel-title">工具对比</div>
+    <button class="compare-close" id="compareClose">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+  </div>
   <table class="compare-table" id="compareTable"></table>
 </div>
-<section class="snap-section footer-section" id="sec-footer" data-section="footer">
+
+<!-- FOOTER -->
+<section class="snap-section footer-section" id="sec-footer" data-section="footer" data-component="Footer">
   <div class="footer-brand">AI Tool Atlas</div>
   <p>数据来源于各产品官方文档、开发者社区和第三方评测。评分与排名仅供参考。</p>
   <p style="margin-top:16px;opacity:.6">2026 年 7 月</p>
 </section>
-<div class="author-overlay" id="authorOverlay" onclick="closeAuthorPanel()"></div>
-<div class="author-panel" id="authorPanel">
-  <div class="author-panel-header">
-    <button class="author-panel-close" onclick="closeAuthorPanel()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
-    <h2>作者信息</h2><div class="ap-subtitle">Web Developer & Creator</div>
-  </div>
-  <div class="ap-divider"></div>
-  <div class="author-panel-body"><div class="author-info-grid">
-    <div class="author-info-item"><div class="author-info-icon birthday"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/></svg></div><div class="author-info-text"><span class="author-info-label">出生日期</span><span class="author-info-value">2006 年 9 月 17 日</span></div></div>
-    <div class="author-info-item"><div class="author-info-icon gender"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="5"/><path d="M12 13v8"/><path d="M9 18h6"/></svg></div><div class="author-info-text"><span class="author-info-label">性别</span><span class="author-info-value">男</span></div></div>
-    <div class="author-info-item"><div class="author-info-icon hobby"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 20.94c1.5 0 2.75 1.06 4 1.06 3 0 6-8 6-12.22A4.91 4.91 0 0 0 17 5c-2.22 0-4 1.44-5 2-1-.56-2.78-2-5-2a4.9 4.9 0 0 0-5 4.78C2 14 5 22 8 22c1.25 0 2.5-1.06 4-1.06Z"/></svg></div><div class="author-info-text"><span class="author-info-label">业余爱好</span><span class="author-info-value">电影 / 排球 / 看书</span></div></div>
-  </div></div>
-  <div class="author-panel-footer"><p>"用代码创造可能，用设计表达态度。"</p></div>
-</div>
-<div class="tool-overlay" id="toolOverlay" onclick="closeToolDetail()"></div>
-<div class="tool-detail" id="toolDetail">
-  <div class="td-header">
-    <button class="td-close" onclick="closeToolDetail()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
-    <div class="td-logo" id="tdLogo"></div><div class="td-info"><div class="td-name" id="tdName"></div><div class="td-vendor" id="tdVendor"></div></div>
-  </div>
-  <div class="td-body">
-    <div class="td-lang-toggle"><button class="td-lang-btn active" id="langZh" onclick="setToolLang('zh')">中文</button><button class="td-lang-btn" id="langEn" onclick="setToolLang('en')">English</button></div>
-    <div class="td-section"><h3 id="tdDescTitle">工具简介</h3><div class="td-desc" id="tdDesc"></div></div>
-    <div class="td-section"><h3 id="tdTagsTitle">核心标签</h3><div class="td-tags" id="tdTags"></div></div>
-    <div class="td-section"><h3 id="tdStrengthsTitle">核心优势</h3><ul class="td-strengths" id="tdStrengths"></ul></div>
-    <div class="td-section"><h3 id="tdCreatorTitle">创作者</h3><div class="td-desc" id="tdCreator"></div></div>
-  </div>
-  <div class="td-footer"><div class="td-price" id="tdPrice"></div><a class="td-link" id="tdLink" href="#" target="_blank" rel="noopener">访问官网 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a></div>
-</div>
-<button class="chat-toggle" id="chatToggle" onclick="toggleChat()"><span class="chat-pulse"></span><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-<div class="chat-widget" id="chatWidget">
-  <div class="chat-header"><div class="chat-header-avatar">AI</div><div class="chat-header-info"><div class="chat-header-title">AI 工具助手</div><div class="chat-header-status">在线</div></div></div>
-  <div class="chat-messages" id="chatMessages"></div>
-  <div class="chat-suggestions" id="chatSuggestions"><button class="chat-suggestion" onclick="sendSuggestion(this)">推荐建站工具</button><button class="chat-suggestion" onclick="sendSuggestion(this)">最好的代码编辑器</button><button class="chat-suggestion" onclick="sendSuggestion(this)">免费工具有哪些</button><button class="chat-suggestion" onclick="sendSuggestion(this)">小程序开发推荐</button></div>
-  <div class="chat-input-area"><textarea class="chat-input" id="chatInput" placeholder="输入你的问题..." rows="1" onkeydown="handleChatKey(event)"></textarea><button class="chat-send" id="chatSend" onclick="sendChatMessage()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></svg></button></div>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
 <script>
-const tools=[{"id":"cursor","name":"Cursor","vendor":"Anysphere","category":"code","rating":4.8,"desc":"基于 VS Code 的 AI-first 代码编辑器，深度集成多模型代码生成、对话式编程和上下文感知补全。","tags":["代码补全","对话编程","多文件编辑"],"pricing":"freemium","priceLabel":"$20/月起","priceNum":20,"color":"#8338ec","url":"https://cursor.com","descEn":"AI-first code editor based on VS Code with multi-model code generation and context-aware completion.","tagsEn":["Code Completion","Chat Coding","Multi-file"],"lat":37.77,"lon":-122.42,"creator":"Anysphere 团队","creatorEn":"Anysphere Team","strengths":["多模型自由切换，灵活性极高","深度理解整个代码仓库上下文","多文件联动编辑效率极高","基于 VS Code，学习成本极低"],"strengthsEn":["Multi-model switching flexibility","Deep full-codebase context","Multi-file editing efficiency","Built on VS Code, easy to learn"]},{"id":"copilot","name":"GitHub Copilot","vendor":"GitHub / Microsoft","category":"code","rating":4.7,"desc":"最广泛使用的 AI 编程助手，深度集成于 VS Code 和 JetBrains，支持 Agent 模式和工作区级代码理解。","tags":["代码补全","Agent 模式","多 IDE"],"pricing":"freemium","priceLabel":"$10/月起","priceNum":10,"color":"#1a7f64","url":"https://github.com/features/copilot","descEn":"Most widely used AI coding assistant integrated with VS Code and JetBrains, supporting Agent mode.","tagsEn":["Code Completion","Agent Mode","Multi-IDE"],"lat":37.78,"lon":-122.39,"creator":"GitHub (Microsoft)","creatorEn":"GitHub (Microsoft)","strengths":["全球最广泛使用的 AI 编程助手","Agent 模式实现自主编程","工作区级代码理解能力强大","支持几乎所有主流 IDE"],"strengthsEn":["Most widely adopted AI coding assistant","Agent mode for autonomous coding","Workspace-level code understanding","Supports nearly all major IDEs"]},{"id":"windsurf","name":"Windsurf","vendor":"OpenAI","category":"code","rating":4.5,"desc":"AI 原生 IDE，Cascade 流式编码体验，将 AI 对话与实时编码深度融合，支持自动运行终端命令。","tags":["流式编码","终端集成","实时预览"],"pricing":"freemium","priceLabel":"$15/月起","priceNum":15,"color":"#09b6a2","url":"https://windsurf.com","descEn":"AI-native IDE with Cascade streaming coding, deeply fusing AI conversation with real-time coding.","tagsEn":["Streaming Code","Terminal","Live Preview"],"lat":37.44,"lon":-122.14,"creator":"Codeium 团队","creatorEn":"Codeium Team","strengths":["Cascade 流式编码体验创新","AI 对话与编码深度融合","自动运行终端命令提升效率","实时预览开发结果"],"strengthsEn":["Innovative Cascade streaming","Deep AI chat + coding fusion","Auto terminal execution","Live preview results"]},{"id":"tabnine","name":"Tabnine","vendor":"Tabnine","category":"code","rating":4.2,"desc":"专注隐私的 AI 代码补全工具，支持本地部署和企业私有云，覆盖所有主流 IDE 和编程语言。","tags":["隐私优先","本地部署","企业级"],"pricing":"freemium","priceLabel":"$12/月起","priceNum":12,"color":"#5046e5","url":"https://www.tabnine.com","descEn":"Privacy-focused AI code completion with local deployment and enterprise private cloud.","tagsEn":["Privacy First","Local Deploy","Enterprise"],"lat":32.08,"lon":34.78,"creator":"Tabnine (以色列)","creatorEn":"Tabnine (Israel)","strengths":["数据不出本地，隐私安全","支持企业私有云部署","覆盖全部主流 IDE 和语言","合规性强，适合金融医疗"],"strengthsEn":["Data stays local, privacy safe","Enterprise private cloud deploy","Covers all major IDEs & languages","Strong compliance for finance/healthcare"]},{"id":"amazon-q","name":"Amazon Q Developer","vendor":"AWS","category":"code","rating":4.1,"desc":"AWS 原生 AI 开发助手，擅长 AWS 架构代码生成、安全扫描和代码转换。","tags":["AWS 集成","安全扫描","云原生"],"pricing":"freemium","priceLabel":"按使用量","priceNum":0,"color":"#d4840a","url":"https://aws.amazon.com/q/developer/","descEn":"AWS-native AI dev assistant excelling at AWS architecture code generation and security scanning.","tagsEn":["AWS Integration","Security","Cloud Native"],"lat":47.61,"lon":-122.33,"creator":"Amazon Web Services","creatorEn":"Amazon Web Services","strengths":["AWS 服务深度原生集成","自动安全漏洞扫描检测","Java 版本升级等代码转换","云原生架构最佳实践建议"],"strengthsEn":["Deep AWS service integration","Auto security scanning","Code transformation like Java upgrades","Cloud-native best practices"]},{"id":"jetbrains-ai","name":"JetBrains AI","vendor":"JetBrains","category":"code","rating":4.3,"desc":"JetBrains 全系 IDE 内置 AI 助手，利用项目索引和类型系统提供精准补全和测试建议。","tags":["JetBrains 原生","项目索引","测试生成"],"pricing":"freemium","priceLabel":"含于订阅","priceNum":0,"color":"#d94080","url":"https://www.jetbrains.com/ai/","descEn":"Built-in AI across all JetBrains IDEs leveraging project indexing for precise completion.","tagsEn":["JetBrains Native","Project Index","Test Gen"],"lat":50.08,"lon":14.42,"creator":"JetBrains (布拉格)","creatorEn":"JetBrains (Prague)","strengths":["与 JetBrains IDE 深度原生集成","利用项目索引提供精准建议","自动生成单元测试代码","类型系统感知的智能补全"],"strengthsEn":["Native JetBrains IDE integration","Project indexing for precision","Auto unit test generation","Type-system-aware completion"]},{"id":"sourcegraph","name":"Sourcegraph Cody","vendor":"Sourcegraph","category":"code","rating":4,"desc":"基于全代码库搜索的 AI 编程助手，能理解跨文件依赖和代码库结构。","tags":["代码搜索","跨文件理解"],"pricing":"freemium","priceLabel":"$9/月起","priceNum":9,"color":"#5b3af0","url":"https://sourcegraph.com/cody","descEn":"AI coding assistant powered by full-codebase search understanding cross-file dependencies.","tagsEn":["Code Search","Cross-file"],"lat":37.78,"lon":-122.4,"creator":"Sourcegraph 团队","creatorEn":"Sourcegraph Team","strengths":["全代码库语义搜索能力","跨文件依赖关系深度理解","大型代码仓库高效导航","上下文感知的精准回答"],"strengthsEn":["Full-codebase semantic search","Cross-file dependency understanding","Efficient large repo navigation","Context-aware precise answers"]},{"id":"supermaven","name":"Supermaven","vendor":"Supermaven","category":"code","rating":4.3,"desc":"极低延迟的 AI 代码补全引擎，百万 token 上下文窗口，精准感知整个代码仓库。","tags":["超低延迟","百万上下文","精准补全"],"pricing":"freemium","priceLabel":"$10/月起","priceNum":10,"color":"#c46a18","url":"https://supermaven.com","descEn":"Ultra-low latency AI code completion with million-token context window.","tagsEn":["Ultra-low Latency","Million Context","Precise"],"lat":37.78,"lon":-122.41,"creator":"Supermaven 团队","creatorEn":"Supermaven Team","strengths":["补全延迟低于 100ms","百万 token 上下文窗口","感知整个代码仓库结构","打字体验极其流畅"],"strengthsEn":["Completion latency under 100ms","Million-token context window","Full codebase awareness","Extremely smooth typing"]},{"id":"v0","name":"v0.dev","vendor":"Vercel","category":"website","rating":4.7,"desc":"通过自然语言对话生成基于 React、Tailwind CSS 和 shadcn/ui 的高质量前端组件和页面。","tags":["React","Tailwind","shadcn/ui"],"pricing":"freemium","priceLabel":"$20/月起","priceNum":20,"color":"#444","url":"https://v0.dev","descEn":"Generate high-quality React/Tailwind/shadcn/ui components through natural language.","tagsEn":["React","Tailwind","shadcn/ui"],"lat":37.77,"lon":-122.42,"creator":"Vercel 团队","creatorEn":"Vercel Team","strengths":["生成高质量 React 组件","Tailwind + shadcn/ui 原生支持","对话式迭代设计流程","代码可直接部署到 Vercel"],"strengthsEn":["High-quality React components","Native Tailwind + shadcn/ui","Conversational iteration","Deploy directly to Vercel"]},{"id":"bolt","name":"Bolt.new","vendor":"StackBlitz","category":"website","rating":4.5,"desc":"全栈 AI 应用构建器，浏览器沙盒中运行完整开发环境，支持从 prompt 直接生成和部署。","tags":["全栈","浏览器 IDE","即时部署"],"pricing":"freemium","priceLabel":"$20/月起","priceNum":20,"color":"#2563eb","url":"https://bolt.new","descEn":"Full-stack AI app builder with browser sandbox and prompt-to-deploy workflow.","tagsEn":["Full-stack","Browser IDE","Instant Deploy"],"lat":29.76,"lon":-95.37,"creator":"StackBlitz 团队","creatorEn":"StackBlitz Team","strengths":["浏览器内完整开发环境","Prompt 直达部署一步到位","WebContainer 沙盒安全隔离","全栈应用快速原型制作"],"strengthsEn":["Complete browser dev environment","Prompt-to-deploy in one step","WebContainer sandbox isolation","Rapid full-stack prototyping"]},{"id":"framer-ai","name":"Framer AI","vendor":"Framer","category":"website","rating":4.4,"desc":"设计师友好的 AI 网站构建器，支持自定义动画、CMS 和 SEO。","tags":["无代码","动画","CMS"],"pricing":"freemium","priceLabel":"$10/月起","priceNum":10,"color":"#0055ff","url":"https://www.framer.com","descEn":"Designer-friendly AI website builder with custom animations, CMS and SEO.","tagsEn":["No-code","Animation","CMS"],"lat":52.37,"lon":4.89,"creator":"Framer (阿姆斯特丹)","creatorEn":"Framer (Amsterdam)","strengths":["设计师友好的可视化界面","丰富的自定义动画效果","内置 CMS 和 SEO 优化","AI 辅助快速生成网站"],"strengthsEn":["Designer-friendly visual interface","Rich custom animations","Built-in CMS and SEO","AI-assisted rapid generation"]},{"id":"durable","name":"Durable AI","vendor":"Durable","category":"website","rating":3.8,"desc":"面向中小企业的 AI 网站快速生成器，30 秒内生成包含文案和联系表单的商业网站。","tags":["快速建站","中小企业","CRM"],"pricing":"paid","priceLabel":"$12/月起","priceNum":12,"color":"#1a8754","url":"https://durable.co","descEn":"AI website generator for SMBs creating business sites in 30 seconds.","tagsEn":["Quick Build","SMB","CRM"],"lat":37.77,"lon":-122.41,"creator":"Durable 团队","creatorEn":"Durable Team","strengths":["30 秒极速建站","内置 CRM 客户管理","自动文案生成","适合中小企业快速上线"],"strengthsEn":["30-second site creation","Built-in CRM","Auto copy generation","Quick launch for SMBs"]},{"id":"10web","name":"10Web","vendor":"10Web","category":"website","rating":3.9,"desc":"WordPress 生态的 AI 建站平台，可根据描述或参考 URL 自动生成 WordPress 网站。","tags":["WordPress","URL 克隆"],"pricing":"freemium","priceLabel":"$10/月起","priceNum":10,"color":"#c23a22","url":"https://10web.io","descEn":"AI-powered WordPress platform generating sites from descriptions or URLs.","tagsEn":["WordPress","URL Clone"],"lat":34.05,"lon":-118.24,"creator":"10Web 团队","creatorEn":"10Web Team","strengths":["WordPress 生态完美集成","URL 克隆复制网站设计","AI 自动优化性能","丰富的模板和插件"],"strengthsEn":["Perfect WordPress integration","URL clone for design replication","AI auto optimization","Rich templates and plugins"]},{"id":"hostinger-ai","name":"Hostinger AI","vendor":"Hostinger","category":"website","rating":3.7,"desc":"通过问答式交互快速生成品牌网站，集成 AI 文案生成和 Logo 制作。","tags":["问答建站","AI 文案"],"pricing":"paid","priceLabel":"$2.99/月起","priceNum":3,"color":"#673de6","url":"https://www.hostinger.com","descEn":"Quick brand website generation through Q&A with AI copywriting and logo creation.","tagsEn":["Q&A Builder","AI Copy"],"lat":54.69,"lon":25.28,"creator":"Hostinger (立陶宛)","creatorEn":"Hostinger (Lithuania)","strengths":["问答式交互极简建站","AI 文案和 Logo 一键生成","性价比极高的托管方案","全球 CDN 加速"],"strengthsEn":["Minimalist Q&A site building","One-click AI copy and logo","Cost-effective hosting","Global CDN acceleration"]},{"id":"dora-ai","name":"Dora AI","vendor":"Dora","category":"website","rating":4.2,"desc":"以 3D 动画和视觉表现力见长的 AI 网站生成器，生成具有三维交互效果的网页。","tags":["3D 动画","交互效果"],"pricing":"freemium","priceLabel":"$9/月起","priceNum":9,"color":"#c43a3e","url":"https://www.dora.run","descEn":"AI website generator excelling at 3D animations and visual effects.","tagsEn":["3D Animation","Interactive"],"lat":37.77,"lon":-122.42,"creator":"Dora 团队","creatorEn":"Dora Team","strengths":["3D 动画网页效果惊艳","视觉表现力远超传统建站","AI 驱动的交互设计","支持复杂三维场景"],"strengthsEn":["Stunning 3D web animations","Visual impact beyond builders","AI-driven interactive design","Complex 3D scene support"]},{"id":"replit-agent","name":"Replit Agent","vendor":"Replit","category":"app","rating":4.5,"desc":"AI 全栈开发代理，从自然语言需求出发，自动完成项目搭建、编码、数据库配置和一键部署。","tags":["全栈开发","自动部署","数据库"],"pricing":"freemium","priceLabel":"$25/月起","priceNum":25,"color":"#d45a0a","url":"https://replit.com","descEn":"AI full-stack dev agent with auto project setup, coding, DB config and deploy.","tagsEn":["Full-stack","Auto Deploy","Database"],"lat":37.44,"lon":-122.16,"creator":"Replit 团队","creatorEn":"Replit Team","strengths":["自然语言直达完整应用","自动项目搭建和数据库配置","一键部署上线","协作开发环境"],"strengthsEn":["Natural language to full app","Auto setup and DB config","One-click deployment","Collaborative environment"]},{"id":"lovable","name":"Lovable","vendor":"Lovable","category":"app","rating":4.4,"desc":"从自然语言描述生成完整 Web 应用，支持 Supabase 数据库集成和自定义域名部署。","tags":["自然语言","Supabase","域名部署"],"pricing":"freemium","priceLabel":"$20/月起","priceNum":20,"color":"#c03888","url":"https://lovable.dev","descEn":"Generate complete web apps from natural language with Supabase integration.","tagsEn":["Natural Language","Supabase","Custom Domain"],"lat":59.33,"lon":18.07,"creator":"Lovable (斯德哥尔摩)","creatorEn":"Lovable (Stockholm)","strengths":["自然语言生成完整 Web 应用","Supabase 数据库无缝集成","自定义域名一键部署","代码质量高可手动修改"],"strengthsEn":["Complete apps from natural language","Seamless Supabase integration","One-click custom domain","High quality editable code"]},{"id":"flutterflow","name":"FlutterFlow","vendor":"FlutterFlow","category":"app","rating":4.3,"desc":"可视化 Flutter 应用构建平台，集成 AI 辅助生成页面和逻辑，支持发布到 iOS、Android 和 Web。","tags":["Flutter","跨平台","移动应用"],"pricing":"freemium","priceLabel":"$30/月起","priceNum":30,"color":"#5a52d5","url":"https://flutterflow.io","descEn":"Visual Flutter app builder with AI-assisted page/logic generation.","tagsEn":["Flutter","Cross-platform","Mobile"],"lat":37.39,"lon":-122.08,"creator":"FlutterFlow 团队","creatorEn":"FlutterFlow Team","strengths":["可视化 Flutter 开发体验","AI 辅助生成页面和逻辑","一键发布到 iOS/Android/Web","丰富的预制组件库"],"strengthsEn":["Visual Flutter development","AI-assisted pages and logic","Publish to iOS/Android/Web","Rich component library"]},{"id":"bubble","name":"Bubble","vendor":"Bubble","category":"app","rating":4.1,"desc":"成熟的全栈无代码平台，通过可视化编辑器构建复杂 Web 应用逻辑，支持数据库和 API 集成。","tags":["无代码","全栈","API 集成"],"pricing":"freemium","priceLabel":"$29/月起","priceNum":29,"color":"#1d68d4","url":"https://bubble.io","descEn":"Mature no-code platform for complex web apps with visual logic editor.","tagsEn":["No-code","Full-stack","API"],"lat":40.71,"lon":-74.01,"creator":"Bubble (纽约)","creatorEn":"Bubble (New York)","strengths":["最成熟的全栈无代码平台","强大的可视化逻辑编辑器","丰富的数据库和 API 集成","庞大的插件生态系统"],"strengthsEn":["Most mature no-code platform","Powerful visual logic editor","Rich DB and API integration","Massive plugin ecosystem"]},{"id":"adalo","name":"Adalo","vendor":"Adalo","category":"app","rating":3.8,"desc":"面向移动应用的无代码平台，通过拖拽组件构建原生移动 App 并发布到应用商店。","tags":["移动应用","无代码","原生发布"],"pricing":"freemium","priceLabel":"$36/月起","priceNum":36,"color":"#1a3a6b","url":"https://www.adalo.com","descEn":"Mobile-focused no-code platform with drag-and-drop native app building.","tagsEn":["Mobile","No-code","Native Publish"],"lat":40.76,"lon":-73.98,"creator":"Adalo (纽约)","creatorEn":"Adalo (New York)","strengths":["拖拽式移动应用开发","一键发布到 App Store","原生移动应用体验","简洁直观的界面设计"],"strengthsEn":["Drag-and-drop mobile dev","One-click App Store publish","Native mobile experience","Clean intuitive interface"]},{"id":"glide","name":"Glide","vendor":"Glide","category":"app","rating":4,"desc":"基于电子表格数据的 AI 应用构建器，将 Google Sheets 或 Excel 数据快速转化为业务应用。","tags":["表格驱动","内部工具"],"pricing":"freemium","priceLabel":"$25/月起","priceNum":25,"color":"#0ab89a","url":"https://www.glideapps.com","descEn":"Spreadsheet-driven AI app builder converting Google Sheets to business apps.","tagsEn":["Spreadsheet","Internal Tools"],"lat":37.77,"lon":-122.42,"creator":"Glide 团队","creatorEn":"Glide Team","strengths":["表格数据秒变应用","零代码构建内部工具","AI 辅助数据处理","实时更新数据同步"],"strengthsEn":["Spreadsheet to app instantly","Zero-code internal tools","AI data processing","Real-time data sync"]},{"id":"expo","name":"Expo","vendor":"Expo","category":"app","rating":4.4,"desc":"React Native 开发平台与工具链，提供 AI 辅助代码生成、热更新和应用分发。","tags":["React Native","跨平台","原生应用"],"pricing":"freemium","priceLabel":"免费起","priceNum":0,"color":"#1a6fb5","url":"https://expo.dev","descEn":"React Native development platform with AI code generation, hot updates and distribution.","tagsEn":["React Native","Cross-platform","Native"],"lat":37.77,"lon":-122.42,"creator":"Expo 团队","creatorEn":"Expo Team","strengths":["React Native 最佳开发体验","热更新无需重新发布","EAS Build 云端构建","丰富的社区和文档"],"strengthsEn":["Best React Native experience","Hot updates without republish","EAS Build cloud builds","Rich community and docs"]},{"id":"ionic","name":"Ionic","vendor":"Ionic","category":"app","rating":4,"desc":"基于 Web 技术的跨平台应用开发框架，结合 Capacitor 原生能力构建 iOS 和 Android 应用。","tags":["Web 技术栈","Capacitor","跨平台"],"pricing":"freemium","priceLabel":"免费起","priceNum":0,"color":"#3880ff","url":"https://ionicframework.com","descEn":"Web-tech cross-platform framework using Capacitor for native iOS and Android.","tagsEn":["Web Stack","Capacitor","Cross-platform"],"lat":43.04,"lon":-76.14,"creator":"Ionic (雪城)","creatorEn":"Ionic (Syracuse)","strengths":["Web 技术栈开发移动应用","Capacitor 原生能力桥接","一套代码多端运行","企业级应用开发支持"],"strengthsEn":["Mobile apps with web tech","Capacitor native bridge","One codebase multi-platform","Enterprise dev support"]},{"id":"electron","name":"Electron","vendor":"OpenJS Foundation","category":"app","rating":4.2,"desc":"使用 HTML、CSS 和 JavaScript 构建跨平台桌面应用的框架，VS Code、Slack 等均基于此开发。","tags":["桌面应用","Web 技术","跨平台"],"pricing":"open-source","priceLabel":"免费开源","priceNum":0,"color":"#2b2e38","url":"https://www.electronjs.org","descEn":"Framework for cross-platform desktop apps with HTML/CSS/JS. Used by VS Code and Slack.","tagsEn":["Desktop","Web Tech","Cross-platform"],"lat":37.77,"lon":-122.42,"creator":"OpenJS Foundation","creatorEn":"OpenJS Foundation","strengths":["Web 技术开发桌面应用","VS Code/Slack 等大型应用验证","完整原生 API 访问","跨 macOS/Windows/Linux"],"strengthsEn":["Desktop apps with web tech","Proven by VS Code, Slack","Full native API access","Cross macOS/Windows/Linux"]},{"id":"locofy","name":"Locofy","vendor":"Locofy","category":"design","rating":4.3,"desc":"将 Figma 设计稿精准转换为 React、Next.js、Vue 等前端代码，AI 辅助识别组件结构。","tags":["Figma 转代码","React","响应式"],"pricing":"freemium","priceLabel":"$25/月起","priceNum":25,"color":"#6d28d9","url":"https://www.locofy.ai","descEn":"Accurately convert Figma designs to React/Next.js/Vue with AI component recognition.","tagsEn":["Figma to Code","React","Responsive"],"lat":1.35,"lon":103.82,"creator":"Locofy (新加坡)","creatorEn":"Locofy (Singapore)","strengths":["Figma 设计稿精准转代码","支持 React/Next.js/Vue 多框架","AI 智能识别组件结构","响应式布局自动适配"],"strengthsEn":["Precise Figma to code","Multi-framework support","AI component recognition","Auto responsive layout"]},{"id":"builder-io","name":"Builder.io","vendor":"Builder.io","category":"design","rating":4.2,"desc":"Visual Copilot 利用 AI 将 Figma 设计稿转化为框架原生代码，支持 React、Vue、Svelte。","tags":["Figma 转代码","多框架"],"pricing":"freemium","priceLabel":"$19/月起","priceNum":19,"color":"#c44090","url":"https://www.builder.io","descEn":"Visual Copilot converts Figma designs into framework-native code.","tagsEn":["Figma to Code","Multi-framework"],"lat":37.77,"lon":-122.42,"creator":"Builder.io 团队","creatorEn":"Builder.io Team","strengths":["Visual Copilot AI 转码","支持 React/Vue/Svelte 多框架","可视化编辑和 CMS 集成","企业级组件管理系统"],"strengthsEn":["Visual Copilot AI conversion","Multi-framework support","Visual editing + CMS","Enterprise component management"]},{"id":"anima","name":"Anima","vendor":"Anima","category":"design","rating":3.9,"desc":"设计到代码的桥梁，支持从 Figma 和 Adobe XD 导出 React、Vue 和 HTML 代码。","tags":["Figma 导出","Vue","HTML"],"pricing":"freemium","priceLabel":"$31/月起","priceNum":31,"color":"#5b52e0","url":"https://www.animaapp.com","descEn":"Bridge from design to code, exporting React/Vue/HTML from Figma and Adobe XD.","tagsEn":["Figma Export","Vue","HTML"],"lat":32.06,"lon":34.77,"creator":"Anima (特拉维夫)","creatorEn":"Anima (Tel Aviv)","strengths":["Figma 和 Adobe XD 双平台","导出 React/Vue/HTML 多格式","设计师和开发者协作桥梁","组件级别精准转换"],"strengthsEn":["Dual platform support","Multi-format export","Designer-developer bridge","Component-level conversion"]},{"id":"teleportHQ","name":"TeleportHQ","vendor":"TeleportHQ","category":"design","rating":3.8,"desc":"AI 驱动的可视化前端开发平台，支持从线框图或草图生成 UI 并导出为多框架代码。","tags":["线框图生成","可视化编辑"],"pricing":"freemium","priceLabel":"$15/月起","priceNum":15,"color":"#2d6cdf","url":"https://teleporthq.io","descEn":"AI visual frontend platform generating UI from wireframes or sketches.","tagsEn":["Wireframe Gen","Visual Editor"],"lat":46.77,"lon":23.59,"creator":"TeleportHQ (克卢日)","creatorEn":"TeleportHQ (Cluj)","strengths":["线框图/草图直接生成 UI","可视化拖拽编辑器","多框架代码导出","实时协作开发"],"strengthsEn":["UI from wireframes/sketches","Drag-and-drop editor","Multi-framework export","Real-time collaboration"]},{"id":"screenshots","name":"Screenshot to Code","vendor":"Abi (开源)","category":"design","rating":4,"desc":"开源工具，将任意网页截图或 URL 转化为 HTML/Tailwind/React 代码。","tags":["截图转代码","开源","Tailwind"],"pricing":"open-source","priceLabel":"免费开源","priceNum":0,"color":"#0f9b72","url":"https://github.com/abi/screenshot-to-code","descEn":"Open-source tool converting web screenshots or URLs into HTML/Tailwind/React code.","tagsEn":["Screenshot to Code","Open Source","Tailwind"],"lat":37.77,"lon":-122.42,"creator":"Abi (开源社区)","creatorEn":"Abi (Open Source)","strengths":["完全免费开源","截图/URL 直接转代码","支持 HTML/Tailwind/React","社区活跃持续更新"],"strengthsEn":["Completely free open source","Screenshot/URL to code","HTML/Tailwind/React support","Active community updates"]},{"id":"img2code","name":"img2code","vendor":"Macstadium","category":"design","rating":3.7,"desc":"基于视觉模型的 UI 图片转代码工具，上传设计图片即可生成结构化的 HTML/CSS 代码。","tags":["图片转代码","CSS 框架"],"pricing":"freemium","priceLabel":"$9/月起","priceNum":9,"color":"#b8860b","url":"https://img2code.com","descEn":"Vision-model UI image to code tool generating structured HTML/CSS.","tagsEn":["Image to Code","CSS"],"lat":33.75,"lon":-84.39,"creator":"Macstadium (亚特兰大)","creatorEn":"Macstadium (Atlanta)","strengths":["设计图片直接转代码","结构化 HTML/CSS 输出","批量处理多张图片","支持多种设计格式"],"strengthsEn":["Design image to code","Structured HTML/CSS output","Batch processing","Multiple design formats"]},{"id":"claude","name":"Claude","vendor":"Anthropic","category":"chat","rating":4.9,"desc":"Artifacts 功能可在对话中实时生成和预览代码、网页、图表等，Claude Code 提供终端级编程能力。","tags":["Artifacts","Claude Code","终端编程"],"pricing":"freemium","priceLabel":"$20/月起","priceNum":20,"color":"#b5654a","url":"https://claude.ai","descEn":"Artifacts generates code/pages/charts in real-time. Claude Code provides terminal-level programming.","tagsEn":["Artifacts","Claude Code","Terminal"],"lat":37.77,"lon":-122.42,"creator":"Anthropic 团队","creatorEn":"Anthropic Team","strengths":["Artifacts 实时生成和预览","Claude Code 终端级编程能力","超长上下文窗口 (200K)","代码质量和安全性极高"],"strengthsEn":["Artifacts real-time generation","Claude Code terminal-level","Ultra-long context (200K)","Extremely high code quality"]},{"id":"chatgpt","name":"ChatGPT","vendor":"OpenAI","category":"chat","rating":4.7,"desc":"Canvas 模式提供代码和文档的协同编辑界面，支持代码生成、调试、数据分析和多模态理解。","tags":["Canvas 模式","多模态","代码执行"],"pricing":"freemium","priceLabel":"$20/月起","priceNum":20,"color":"#0e8a6a","url":"https://chat.openai.com","descEn":"Canvas mode for collaborative code/document editing with multimodal understanding.","tagsEn":["Canvas Mode","Multimodal","Code Exec"],"lat":37.77,"lon":-122.42,"creator":"OpenAI 团队","creatorEn":"OpenAI Team","strengths":["Canvas 模式协同编辑","强大的多模态理解能力","代码解释器数据分析","GPT-4o 全方位能力"],"strengthsEn":["Canvas collaborative editing","Powerful multimodal","Code interpreter for data","GPT-4o comprehensive"]},{"id":"gemini","name":"Gemini","vendor":"Google","category":"chat","rating":4.4,"desc":"集成于 Google Workspace 生态，支持超长上下文窗口，代码生成和项目管理能力持续增强。","tags":["多模态","超长上下文"],"pricing":"freemium","priceLabel":"$20/月起","priceNum":20,"color":"#3a7bd5","url":"https://gemini.google.com","descEn":"Integrated with Google Workspace, ultra-long context with improving code generation.","tagsEn":["Multimodal","Long Context"],"lat":37.42,"lon":-122.08,"creator":"Google DeepMind","creatorEn":"Google DeepMind","strengths":["Google Workspace 深度集成","超长上下文窗口 (1M+)","多模态理解能力强大","持续快速迭代升级"],"strengthsEn":["Deep Google Workspace integration","Ultra-long context (1M+)","Powerful multimodal","Rapid continuous iteration"]},{"id":"deepseek","name":"DeepSeek","vendor":"DeepSeek","category":"chat","rating":4.5,"desc":"R1 推理模型在编程和数学推理方面表现突出，支持开源部署，性价比极高。","tags":["推理模型","开源","高性价比"],"pricing":"free","priceLabel":"免费","priceNum":0,"color":"#3d5fd4","url":"https://chat.deepseek.com","descEn":"R1 reasoning model excels at programming and math, open-source with exceptional value.","tagsEn":["Reasoning Model","Open Source","Cost-effective"],"lat":31.23,"lon":121.47,"creator":"深度求索 (上海)","creatorEn":"DeepSeek (Shanghai)","strengths":["R1 推理模型编程能力突出","完全开源可自主部署","性价比极高的免费服务","中文理解和推理能力强"],"strengthsEn":["R1 reasoning excels at coding","Fully open-source deployable","Extremely cost-effective","Strong Chinese reasoning"]},{"id":"qwen","name":"通义千问","vendor":"阿里云","category":"chat","rating":4.3,"desc":"通义灵码提供 IDE 插件支持代码生成和补全，Qwen 系列模型开源且性能优异。","tags":["中文优化","通义灵码","开源模型"],"pricing":"free","priceLabel":"免费","priceNum":0,"color":"#5548c8","url":"https://tongyi.aliyun.com","descEn":"Tongyi Lingma IDE plugins for code generation. Qwen models are open-source with excellent performance.","tagsEn":["Chinese Optimized","Tongyi Lingma","Open Source"],"lat":30.27,"lon":120.15,"creator":"阿里云 (杭州)","creatorEn":"Alibaba Cloud (Hangzhou)","strengths":["中文优化效果极佳","通义灵码 IDE 插件","Qwen 模型开源高性能","阿里云生态深度集成"],"strengthsEn":["Excellent Chinese optimization","Tongyi Lingma IDE plugin","Open-source high-performance","Deep Alibaba Cloud integration"]},{"id":"trae","name":"Trae","vendor":"ByteDance","category":"chat","rating":4.2,"desc":"基于 VS Code 打造的 AI IDE，内置 Builder 模式可从自然语言生成完整项目。","tags":["AI IDE","Builder 模式","中文优化"],"pricing":"free","priceLabel":"免费","priceNum":0,"color":"#5a38d8","url":"https://www.trae.ai","descEn":"AI IDE on VS Code with Builder mode generating complete projects from natural language.","tagsEn":["AI IDE","Builder Mode","Chinese Optimized"],"lat":39.9,"lon":116.4,"creator":"字节跳动 (北京)","creatorEn":"ByteDance (Beijing)","strengths":["Builder 模式生成完整项目","基于 VS Code 生态","中文优化体验好","完全免费无限制使用"],"strengthsEn":["Builder mode for full projects","VS Code ecosystem","Great Chinese experience","Completely free unlimited"]},{"id":"wechat-devtools","name":"微信开发者工具","vendor":"腾讯","category":"miniapp","rating":4.3,"desc":"微信小程序官方 IDE，集成代码编辑、调试、云开发和真机预览。","tags":["官方 IDE","调试","云开发"],"pricing":"free","priceLabel":"免费","priceNum":0,"color":"#07c160","url":"https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html","descEn":"Official WeChat Mini Program IDE with debugging, cloud dev and real-device preview.","tagsEn":["Official IDE","Debug","Cloud Dev"],"lat":22.54,"lon":114.05,"creator":"腾讯 (深圳)","creatorEn":"Tencent (Shenzhen)","strengths":["官方唯一指定开发工具","完整的调试和预览功能","云开发一体化集成","真机预览和体验"],"strengthsEn":["Official dev tool","Complete debug and preview","Integrated cloud development","Real-device testing"]},{"id":"cloudbase","name":"腾讯云开发","vendor":"腾讯","category":"miniapp","rating":4.1,"desc":"面向小程序和服务端的 Serverless 开发平台，提供云函数、云数据库、云存储一体化集成。","tags":["Serverless","云函数","云数据库"],"pricing":"freemium","priceLabel":"按使用量","priceNum":0,"color":"#006eff","url":"https://cloud.tencent.com/product/tcb","descEn":"Serverless platform for mini programs with cloud functions, database and storage.","tagsEn":["Serverless","Cloud Functions","Cloud DB"],"lat":22.54,"lon":114.06,"creator":"腾讯云 (深圳)","creatorEn":"Tencent Cloud (Shenzhen)","strengths":["Serverless 免运维架构","云函数/数据库/存储一体化","小程序原生集成","按量付费成本可控"],"strengthsEn":["Serverless zero-ops","Functions/DB/storage integrated","Native mini program support","Pay-per-use cost control"]},{"id":"uniapp","name":"uni-app","vendor":"DCloud","category":"miniapp","rating":4.4,"desc":"基于 Vue 的跨平台开发框架，一套代码可编译到微信、支付宝等多个小程序及 iOS、Android。","tags":["跨平台","Vue","多端发布"],"pricing":"open-source","priceLabel":"免费开源","priceNum":0,"color":"#2b9939","url":"https://uniapp.dcloud.net.cn","descEn":"Vue-based cross-platform framework for WeChat, Alipay mini programs and iOS/Android.","tagsEn":["Cross-platform","Vue","Multi-target"],"lat":22.54,"lon":114.05,"creator":"DCloud (深圳)","creatorEn":"DCloud (Shenzhen)","strengths":["一套代码多端运行","Vue 语法简单易学","丰富插件市场","活跃社区和文档"],"strengthsEn":["One codebase multi-platform","Simple Vue syntax","Rich plugin marketplace","Active community and docs"]},{"id":"taro","name":"Taro","vendor":"京东","category":"miniapp","rating":4.2,"desc":"京东开源的多端开发框架，支持 React 和 Vue 语法编写小程序。","tags":["多端框架","React","Vue"],"pricing":"open-source","priceLabel":"免费开源","priceNum":0,"color":"#0068b7","url":"https://taro.jd.com","descEn":"JD open-source multi-target framework supporting React and Vue for mini programs.","tagsEn":["Multi-target","React","Vue"],"lat":39.76,"lon":116.51,"creator":"京东 (北京)","creatorEn":"JD.com (Beijing)","strengths":["React 和 Vue 双语法支持","京东大厂开源维护稳定","多端统一开发体验","完善的 TypeScript 支持"],"strengthsEn":["Dual React & Vue syntax","Stable JD.com maintenance","Unified multi-target dev","Complete TypeScript support"]},{"id":"antdev","name":"小程序开发者工具","vendor":"蚂蚁集团","category":"miniapp","rating":3.9,"desc":"支付宝小程序官方开发工具，支持蚂蚁生态全链路开发，内置 AI 辅助代码生成。","tags":["支付宝","蚂蚁生态","AI 辅助"],"pricing":"free","priceLabel":"免费","priceNum":0,"color":"#1677ff","url":"https://opendocs.alipay.com/mini/ide","descEn":"Official Alipay mini program dev tool with Ant ecosystem and AI code generation.","tagsEn":["Alipay","Ant Ecosystem","AI Assist"],"lat":30.27,"lon":120.15,"creator":"蚂蚁集团 (杭州)","creatorEn":"Ant Group (Hangzhou)","strengths":["支付宝小程序官方工具","蚂蚁生态全链路支持","内置 AI 辅助代码生成","完善的调试和预览功能"],"strengthsEn":["Official Alipay tool","Full Ant ecosystem support","Built-in AI code generation","Complete debug and preview"]}];
-const categories=[
-  {id:'code',label:'代码助手'},{id:'website',label:'网站构建'},{id:'app',label:'应用开发'},
-  {id:'design',label:'设计转码'},{id:'chat',label:'对话编程'},{id:'miniapp',label:'小程序开发'}
+/* ═══════════════════════════════════════
+   TOOL DATA
+   ═══════════════════════════════════════ */
+const tools=[
+  {id:'cursor',name:'Cursor',vendor:'Anysphere',category:'code',rating:4.8,desc:'基于 VS Code 的 AI-first 代码编辑器，深度集成多模型代码生成、对话式编程和上下文感知补全。',tags:['代码补全','对话编程','多文件编辑'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#8338ec',url:'https://cursor.com'},
+  {id:'copilot',name:'GitHub Copilot',vendor:'GitHub / Microsoft',category:'code',rating:4.7,desc:'最广泛使用的 AI 编程助手，深度集成于 VS Code 和 JetBrains，支持 Agent 模式和工作区级代码理解。',tags:['代码补全','Agent 模式','多 IDE'],pricing:'freemium',priceLabel:'$10/月起',priceNum:10,color:'#1a7f64',url:'https://github.com/features/copilot'},
+  {id:'windsurf',name:'Windsurf',vendor:'OpenAI',category:'code',rating:4.5,desc:'AI 原生 IDE，Cascade 流式编码体验，将 AI 对话与实时编码深度融合，支持自动运行终端命令。',tags:['流式编码','终端集成','实时预览'],pricing:'freemium',priceLabel:'$15/月起',priceNum:15,color:'#09b6a2',url:'https://windsurf.com'},
+  {id:'tabnine',name:'Tabnine',vendor:'Tabnine',category:'code',rating:4.2,desc:'专注隐私的 AI 代码补全工具，支持本地部署和企业私有云，覆盖所有主流 IDE 和编程语言。',tags:['隐私优先','本地部署','企业级'],pricing:'freemium',priceLabel:'$12/月起',priceNum:12,color:'#5046e5',url:'https://www.tabnine.com'},
+  {id:'amazon-q',name:'Amazon Q Developer',vendor:'AWS',category:'code',rating:4.1,desc:'AWS 原生 AI 开发助手，擅长 AWS 架构代码生成、安全扫描和代码转换。',tags:['AWS 集成','安全扫描','云原生'],pricing:'freemium',priceLabel:'按使用量',priceNum:0,color:'#d4840a',url:'https://aws.amazon.com/q/developer/'},
+  {id:'jetbrains-ai',name:'JetBrains AI',vendor:'JetBrains',category:'code',rating:4.3,desc:'JetBrains 全系 IDE 内置 AI 助手，利用项目索引和类型系统提供精准补全和测试建议。',tags:['JetBrains 原生','项目索引','测试生成'],pricing:'freemium',priceLabel:'含于订阅',priceNum:0,color:'#d94080',url:'https://www.jetbrains.com/ai/'},
+  {id:'sourcegraph',name:'Sourcegraph Cody',vendor:'Sourcegraph',category:'code',rating:4.0,desc:'基于全代码库搜索的 AI 编程助手，能理解跨文件依赖和代码库结构。',tags:['代码搜索','跨文件理解'],pricing:'freemium',priceLabel:'$9/月起',priceNum:9,color:'#5b3af0',url:'https://sourcegraph.com/cody'},
+  {id:'supermaven',name:'Supermaven',vendor:'Supermaven',category:'code',rating:4.3,desc:'极低延迟的 AI 代码补全引擎，百万 token 上下文窗口，精准感知整个代码仓库。',tags:['超低延迟','百万上下文','精准补全'],pricing:'freemium',priceLabel:'$10/月起',priceNum:10,color:'#c46a18',url:'https://supermaven.com'},
+
+  {id:'v0',name:'v0.dev',vendor:'Vercel',category:'website',rating:4.7,desc:'通过自然语言对话生成基于 React、Tailwind CSS 和 shadcn/ui 的高质量前端组件和页面。',tags:['React','Tailwind','shadcn/ui'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#444',url:'https://v0.dev'},
+  {id:'bolt',name:'Bolt.new',vendor:'StackBlitz',category:'website',rating:4.5,desc:'全栈 AI 应用构建器，浏览器沙盒中运行完整开发环境，支持从 prompt 直接生成和部署。',tags:['全栈','浏览器 IDE','即时部署'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#2563eb',url:'https://bolt.new'},
+  {id:'framer-ai',name:'Framer AI',vendor:'Framer',category:'website',rating:4.4,desc:'设计师友好的 AI 网站构建器，支持自定义动画、CMS 和 SEO。',tags:['无代码','动画','CMS'],pricing:'freemium',priceLabel:'$10/月起',priceNum:10,color:'#0055ff',url:'https://www.framer.com'},
+  {id:'durable',name:'Durable AI',vendor:'Durable',category:'website',rating:3.8,desc:'面向中小企业的 AI 网站快速生成器，30 秒内生成包含文案和联系表单的商业网站。',tags:['快速建站','中小企业','CRM'],pricing:'paid',priceLabel:'$12/月起',priceNum:12,color:'#1a8754',url:'https://durable.co'},
+  {id:'10web',name:'10Web',vendor:'10Web',category:'website',rating:3.9,desc:'WordPress 生态的 AI 建站平台，可根据描述或参考 URL 自动生成 WordPress 网站。',tags:['WordPress','URL 克隆'],pricing:'freemium',priceLabel:'$10/月起',priceNum:10,color:'#c23a22',url:'https://10web.io'},
+  {id:'hostinger-ai',name:'Hostinger AI',vendor:'Hostinger',category:'website',rating:3.7,desc:'通过问答式交互快速生成品牌网站，集成 AI 文案生成和 Logo 制作。',tags:['问答建站','AI 文案'],pricing:'paid',priceLabel:'$2.99/月起',priceNum:3,color:'#673de6',url:'https://www.hostinger.com'},
+  {id:'dora-ai',name:'Dora AI',vendor:'Dora',category:'website',rating:4.2,desc:'以 3D 动画和视觉表现力见长的 AI 网站生成器，生成具有三维交互效果的网页。',tags:['3D 动画','交互效果'],pricing:'freemium',priceLabel:'$9/月起',priceNum:9,color:'#c43a3e',url:'https://www.dora.run'},
+
+  {id:'replit-agent',name:'Replit Agent',vendor:'Replit',category:'app',rating:4.5,desc:'AI 全栈开发代理，从自然语言需求出发，自动完成项目搭建、编码、数据库配置和一键部署。',tags:['全栈开发','自动部署','数据库'],pricing:'freemium',priceLabel:'$25/月起',priceNum:25,color:'#d45a0a',url:'https://replit.com'},
+  {id:'lovable',name:'Lovable',vendor:'Lovable',category:'app',rating:4.4,desc:'从自然语言描述生成完整 Web 应用，支持 Supabase 数据库集成和自定义域名部署。',tags:['自然语言','Supabase','域名部署'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#c03888',url:'https://lovable.dev'},
+  {id:'flutterflow',name:'FlutterFlow',vendor:'FlutterFlow',category:'app',rating:4.3,desc:'可视化 Flutter 应用构建平台，集成 AI 辅助生成页面和逻辑，支持发布到 iOS、Android 和 Web。',tags:['Flutter','跨平台','移动应用'],pricing:'freemium',priceLabel:'$30/月起',priceNum:30,color:'#5a52d5',url:'https://flutterflow.io'},
+  {id:'bubble',name:'Bubble',vendor:'Bubble',category:'app',rating:4.1,desc:'成熟的全栈无代码平台，通过可视化编辑器构建复杂 Web 应用逻辑，支持数据库和 API 集成。',tags:['无代码','全栈','API 集成'],pricing:'freemium',priceLabel:'$29/月起',priceNum:29,color:'#1d68d4',url:'https://bubble.io'},
+  {id:'adalo',name:'Adalo',vendor:'Adalo',category:'app',rating:3.8,desc:'面向移动应用的无代码平台，通过拖拽组件构建原生移动 App 并发布到应用商店。',tags:['移动应用','无代码','原生发布'],pricing:'freemium',priceLabel:'$36/月起',priceNum:36,color:'#1a3a6b',url:'https://www.adalo.com'},
+  {id:'glide',name:'Glide',vendor:'Glide',category:'app',rating:4.0,desc:'基于电子表格数据的 AI 应用构建器，将 Google Sheets 或 Excel 数据快速转化为业务应用。',tags:['表格驱动','内部工具'],pricing:'freemium',priceLabel:'$25/月起',priceNum:25,color:'#0ab89a',url:'https://www.glideapps.com'},
+  {id:'expo',name:'Expo',vendor:'Expo',category:'app',rating:4.4,desc:'React Native 开发平台与工具链，提供 AI 辅助代码生成、热更新和应用分发。',tags:['React Native','跨平台','原生应用'],pricing:'freemium',priceLabel:'免费起',priceNum:0,color:'#1a6fb5',url:'https://expo.dev'},
+  {id:'ionic',name:'Ionic',vendor:'Ionic',category:'app',rating:4.0,desc:'基于 Web 技术的跨平台应用开发框架，结合 Capacitor 原生能力构建 iOS 和 Android 应用。',tags:['Web 技术栈','Capacitor','跨平台'],pricing:'freemium',priceLabel:'免费起',priceNum:0,color:'#3880ff',url:'https://ionicframework.com'},
+  {id:'electron',name:'Electron',vendor:'OpenJS Foundation',category:'app',rating:4.2,desc:'使用 HTML、CSS 和 JavaScript 构建跨平台桌面应用的框架，VS Code、Slack 等均基于此开发。',tags:['桌面应用','Web 技术','跨平台'],pricing:'open-source',priceLabel:'免费开源',priceNum:0,color:'#2b2e38',url:'https://www.electronjs.org'},
+
+  {id:'locofy',name:'Locofy',vendor:'Locofy',category:'design',rating:4.3,desc:'将 Figma 设计稿精准转换为 React、Next.js、Vue 等前端代码，AI 辅助识别组件结构。',tags:['Figma 转代码','React','响应式'],pricing:'freemium',priceLabel:'$25/月起',priceNum:25,color:'#6d28d9',url:'https://www.locofy.ai'},
+  {id:'builder-io',name:'Builder.io',vendor:'Builder.io',category:'design',rating:4.2,desc:'Visual Copilot 利用 AI 将 Figma 设计稿转化为框架原生代码，支持 React、Vue、Svelte。',tags:['Figma 转代码','多框架'],pricing:'freemium',priceLabel:'$19/月起',priceNum:19,color:'#c44090',url:'https://www.builder.io'},
+  {id:'anima',name:'Anima',vendor:'Anima',category:'design',rating:3.9,desc:'设计到代码的桥梁，支持从 Figma 和 Adobe XD 导出 React、Vue 和 HTML 代码。',tags:['Figma 导出','Vue','HTML'],pricing:'freemium',priceLabel:'$31/月起',priceNum:31,color:'#5b52e0',url:'https://www.animaapp.com'},
+  {id:'teleportHQ',name:'TeleportHQ',vendor:'TeleportHQ',category:'design',rating:3.8,desc:'AI 驱动的可视化前端开发平台，支持从线框图或草图生成 UI 并导出为多框架代码。',tags:['线框图生成','可视化编辑'],pricing:'freemium',priceLabel:'$15/月起',priceNum:15,color:'#2d6cdf',url:'https://teleporthq.io'},
+  {id:'screenshots',name:'Screenshot to Code',vendor:'Abi (开源)',category:'design',rating:4.0,desc:'开源工具，将任意网页截图或 URL 转化为 HTML/Tailwind/React 代码。',tags:['截图转代码','开源','Tailwind'],pricing:'open-source',priceLabel:'免费开源',priceNum:0,color:'#0f9b72',url:'https://github.com/abi/screenshot-to-code'},
+  {id:'img2code',name:'img2code',vendor:'Macstadium',category:'design',rating:3.7,desc:'基于视觉模型的 UI 图片转代码工具，上传设计图片即可生成结构化的 HTML/CSS 代码。',tags:['图片转代码','CSS 框架'],pricing:'freemium',priceLabel:'$9/月起',priceNum:9,color:'#b8860b',url:'https://img2code.com'},
+
+  {id:'claude',name:'Claude',vendor:'Anthropic',category:'chat',rating:4.9,desc:'Artifacts 功能可在对话中实时生成和预览代码、网页、图表等，Claude Code 提供终端级编程能力。',tags:['Artifacts','Claude Code','终端编程'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#b5654a',url:'https://claude.ai'},
+  {id:'chatgpt',name:'ChatGPT',vendor:'OpenAI',category:'chat',rating:4.7,desc:'Canvas 模式提供代码和文档的协同编辑界面，支持代码生成、调试、数据分析和多模态理解。',tags:['Canvas 模式','多模态','代码执行'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#0e8a6a',url:'https://chat.openai.com'},
+  {id:'gemini',name:'Gemini',vendor:'Google',category:'chat',rating:4.4,desc:'集成于 Google Workspace 生态，支持超长上下文窗口，代码生成和项目管理能力持续增强。',tags:['多模态','超长上下文'],pricing:'freemium',priceLabel:'$20/月起',priceNum:20,color:'#3a7bd5',url:'https://gemini.google.com'},
+  {id:'deepseek',name:'DeepSeek',vendor:'DeepSeek',category:'chat',rating:4.5,desc:'R1 推理模型在编程和数学推理方面表现突出，支持开源部署，性价比极高。',tags:['推理模型','开源','高性价比'],pricing:'free',priceLabel:'免费',priceNum:0,color:'#3d5fd4',url:'https://chat.deepseek.com'},
+  {id:'qwen',name:'通义千问',vendor:'阿里云',category:'chat',rating:4.3,desc:'通义灵码提供 IDE 插件支持代码生成和补全，Qwen 系列模型开源且性能优异。',tags:['中文优化','通义灵码','开源模型'],pricing:'free',priceLabel:'免费',priceNum:0,color:'#5548c8',url:'https://tongyi.aliyun.com'},
+  {id:'trae',name:'Trae',vendor:'ByteDance',category:'chat',rating:4.2,desc:'基于 VS Code 打造的 AI IDE，内置 Builder 模式可从自然语言生成完整项目。',tags:['AI IDE','Builder 模式','中文优化'],pricing:'free',priceLabel:'免费',priceNum:0,color:'#5a38d8',url:'https://www.trae.ai'},
+
+  {id:'wechat-devtools',name:'微信开发者工具',vendor:'腾讯',category:'miniapp',rating:4.3,desc:'微信小程序官方 IDE，集成代码编辑、调试、云开发和真机预览。',tags:['官方 IDE','调试','云开发'],pricing:'free',priceLabel:'免费',priceNum:0,color:'#07c160',url:'https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html'},
+  {id:'cloudbase',name:'腾讯云开发',vendor:'腾讯',category:'miniapp',rating:4.1,desc:'面向小程序和服务端的 Serverless 开发平台，提供云函数、云数据库、云存储一体化集成。',tags:['Serverless','云函数','云数据库'],pricing:'freemium',priceLabel:'按使用量',priceNum:0,color:'#006eff',url:'https://cloud.tencent.com/product/tcb'},
+  {id:'uniapp',name:'uni-app',vendor:'DCloud',category:'miniapp',rating:4.4,desc:'基于 Vue 的跨平台开发框架，一套代码可编译到微信、支付宝等多个小程序及 iOS、Android。',tags:['跨平台','Vue','多端发布'],pricing:'open-source',priceLabel:'免费开源',priceNum:0,color:'#2b9939',url:'https://uniapp.dcloud.net.cn'},
+  {id:'taro',name:'Taro',vendor:'京东',category:'miniapp',rating:4.2,desc:'京东开源的多端开发框架，支持 React 和 Vue 语法编写小程序。',tags:['多端框架','React','Vue'],pricing:'open-source',priceLabel:'免费开源',priceNum:0,color:'#0068b7',url:'https://taro.jd.com'},
+  {id:'antdev',name:'小程序开发者工具',vendor:'蚂蚁集团',category:'miniapp',rating:3.9,desc:'支付宝小程序官方开发工具，支持蚂蚁生态全链路开发，内置 AI 辅助代码生成。',tags:['支付宝','蚂蚁生态','AI 辅助'],pricing:'free',priceLabel:'免费',priceNum:0,color:'#1677ff',url:'https://opendocs.alipay.com/mini/ide'},
 ];
+
+const categories=[
+  {id:'code',label:'代码助手'},
+  {id:'website',label:'网站构建'},
+  {id:'app',label:'应用开发'},
+  {id:'design',label:'设计转码'},
+  {id:'chat',label:'对话编程'},
+  {id:'miniapp',label:'小程序开发'},
+];
+
+/* ═══════════════════════════════════════
+   STATE
+   ═══════════════════════════════════════ */
 let activePrice='all',searchQuery='',sortBy='rating',compareSet=new Set();
-let currentToolLang='zh',currentToolId=null;
 
-/* Cursor */
+/* ═══════════════════════════════════════
+   CUSTOM CURSOR
+   ═══════════════════════════════════════ */
 const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');
-let cmx=0,cmy=0,rx2=0,ry2=0;
-document.addEventListener('mousemove',e=>{cmx=e.clientX;cmy=e.clientY;dot.style.left=cmx+'px';dot.style.top=cmy+'px'});
-function animateCursor(){rx2+=(cmx-rx2)*.12;ry2+=(cmy-ry2)*.12;ring.style.left=rx2+'px';ring.style.top=ry2+'px';requestAnimationFrame(animateCursor)}
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px'});
+function animateCursor(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animateCursor)}
 animateCursor();
-document.addEventListener('mouseover',e=>{if(e.target.closest('a,button,input,textarea,select,.carousel-card,.arrow-btn,.side-dot,.compare-check')){dot.classList.add('hover');ring.classList.add('hover')}else{dot.classList.remove('hover');ring.classList.remove('hover')}});
+document.addEventListener('mouseover',e=>{if(e.target.closest('a,button,input,select,.carousel-card,.arrow-btn,.side-dot,.compare-check')){dot.classList.add('hover');ring.classList.add('hover')}else{dot.classList.remove('hover');ring.classList.remove('hover')}});
 
-/* Hero Particle Title 3D */
-(function(){
-  const canvas=document.getElementById('heroCanvas');if(!canvas)return;
-  const ctx=canvas.getContext('2d');let W,H,particles=[],mouse2={x:-9999,y:-9999};
-  function resize(){const hero=canvas.parentElement;W=canvas.width=hero.offsetWidth;H=canvas.height=hero.offsetHeight;gen()}
-  function gen(){
-    particles=[];const off=document.createElement('canvas');off.width=W;off.height=H;
-    const c=off.getContext('2d');const fs=Math.min(W*.08,72);
-    c.font='bold '+fs+'px "DM Serif Display",Georgia,serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff';
-    c.fillText('AI \u5f00\u53d1\u5de5\u5177',W/2,H/2-fs*.45);c.fillText('\u5168\u666f\u56fe',W/2,H/2+fs*.55);
-    const d=c.getImageData(0,0,W,H).data;const gap=Math.max(2,Math.round(3*W/1200));
-    for(let y=0;y<H;y+=gap)for(let x=0;x<W;x+=gap){
-      const i=(y*W+x)*4;
-      if(d[i+3]>128)particles.push({x,y,z:(Math.random()-.5)*80,ox:x,oy:y,vx:0,vy:0,sz:Math.random()*1.8+1,bo:Math.random()*.4+.5,ph:Math.random()*Math.PI*2})
-    }
-    while(particles.length>2800)particles.splice(Math.floor(Math.random()*particles.length),1);
-  }
-  let fr=0;
-  function draw(){
-    ctx.clearRect(0,0,W,H);fr++;const t=fr*.015,fov=600;
-    for(const p of particles){
-      const dx=mouse2.x-p.x,dy=mouse2.y-p.y,dist=Math.sqrt(dx*dx+dy*dy);
-      if(dist<120&&mouse2.x>0){const f=(1-dist/120)*3;p.vx-=dx/dist*f;p.vy-=dy/dist*f}
-      p.vx+=(p.ox-p.x)*.06;p.vy+=(p.oy-p.y)*.06;p.vx*=.88;p.vy*=.88;p.x+=p.vx;p.y+=p.vy;
-      const zOff=p.z+Math.sin(t+p.ph)*15,scale=fov/(fov+zOff);
-      const px=W/2+(p.x-W/2)*scale,py=H/2+(p.y-H/2)*scale;
-      const sz=Math.max(.3,p.sz*scale),op=Math.min(1,Math.max(.15,p.bo*(0.7+Math.sin(t*.8+p.ph)*.3)*scale));
-      if(op>.55){ctx.globalAlpha=op*.12;ctx.beginPath();ctx.arc(px,py,sz*3,0,Math.PI*2);ctx.fillStyle='rgba(199,125,255,1)';ctx.fill()}
-      ctx.globalAlpha=op;ctx.beginPath();ctx.arc(px,py,sz,0,Math.PI*2);
-      ctx.fillStyle='hsla('+(270+Math.sin(p.ph)*5)+',60%,75%,1)';ctx.fill()
-    }
-    ctx.globalAlpha=1;requestAnimationFrame(draw)
-  }
-  window.addEventListener('resize',resize);document.addEventListener('mousemove',e=>{mouse2.x=e.clientX;mouse2.y=e.clientY});resize();draw()
-})();
+/* ═══════════════════════════════════════
+   HERO PARTICLE SYSTEM
+   ═══════════════════════════════════════ */
+class HeroParticles{
+  constructor(c){this.c=c;this.ctx=c.getContext('2d');this.ps=[];this.resize();window.addEventListener('resize',()=>this.resize())}
+  resize(){const h=this.c.parentElement;this.c.width=h.offsetWidth;this.c.height=h.offsetHeight;if(!this.ps.length)this.spawn()}
+  spawn(){const m=window.innerWidth<768;const n=Math.min(Math.floor(this.c.width*this.c.height/12000),m?35:80);this.ps=[];for(let i=0;i<n;i++)this.ps.push({x:Math.random()*this.c.width,y:Math.random()*this.c.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.8+.3,o:Math.random()*.3+.05})}
+  draw(){const{ctx,c}=this;const w=c.width,h=c.height;ctx.clearRect(0,0,w,h);
+    const t=Date.now()*.0003;
+    const g1=ctx.createRadialGradient(w*.3+Math.sin(t)*80,h*.4+Math.cos(t)*60,0,w*.3,h*.4,300);
+    g1.addColorStop(0,'rgba(157,78,221,.04)');g1.addColorStop(1,'transparent');ctx.fillStyle=g1;ctx.fillRect(0,0,w,h);
+    const g2=ctx.createRadialGradient(w*.7+Math.cos(t*1.3)*60,h*.6+Math.sin(t*1.3)*80,0,w*.7,h*.6,250);
+    g2.addColorStop(0,'rgba(199,125,255,.03)');g2.addColorStop(1,'transparent');ctx.fillStyle=g2;ctx.fillRect(0,0,w,h);
+    for(const p of this.ps){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(157,78,221,${p.o})`;ctx.fill()}
+    const md=120;for(let i=0;i<this.ps.length;i++)for(let j=i+1;j<this.ps.length;j++){const dx=this.ps[i].x-this.ps[j].x,dy=this.ps[i].y-this.ps[j].y,d=Math.sqrt(dx*dx+dy*dy);if(d<md){ctx.beginPath();ctx.moveTo(this.ps[i].x,this.ps[i].y);ctx.lineTo(this.ps[j].x,this.ps[j].y);ctx.strokeStyle=`rgba(157,78,221,${(1-d/md)*.07})`;ctx.lineWidth=.5;ctx.stroke()}}}
+  start(){const loop=()=>{this.draw();requestAnimationFrame(loop)};loop()}
+}
 
-/* Global Mouse Particles (55 enhanced) */
-(function(){
-  const cv=document.getElementById('particleCanvas'),ctx=cv.getContext('2d');let W,H;
-  const ms={x:-9999,y:-9999,px:-9999,py:-9999,speed:0};const ps=[];
-  function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight}
-  class P{
-    constructor(){this.reset()}
-    reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.4;this.vy=(Math.random()-.5)*.4;this.r=Math.random()*3+1;this.bo=Math.random()*.25+.1;this.op=this.bo;this.a=Math.random()*Math.PI*2;this.os=(Math.random()*.015+.005)*(Math.random()>.5?1:-1);this.hue=270+Math.random()*40-20}
-    update(){
-      this.a+=this.os;const dx=ms.x-this.x,dy=ms.y-this.y,dist=Math.sqrt(dx*dx+dy*dy),inf=Math.min(W,H)*.28;
-      if(dist<inf&&ms.x>0){const r=dist/inf;this.vx+=dx*(1-r)*.05;this.vy+=dy*(1-r)*.05;this.vx+=Math.cos(this.a)*(1-r)*.9;this.vy+=Math.sin(this.a)*(1-r)*.9;this.op=this.bo+(1-r)*.45}else this.op+=(this.bo-this.op)*.04;
-      if(ms.speed>4&&dist<180){const s=(1-dist/180)*.02*ms.speed;this.vx+=dx*s*.3;this.vy+=dy*s*.3}
-      this.vx*=.95;this.vy*=.95;this.x+=this.vx;this.y+=this.vy;
-      if(this.x<-60)this.x=W+60;if(this.x>W+60)this.x=-60;if(this.y<-60)this.y=H+60;if(this.y>H+60)this.y=-60
-    }
-    draw(){
-      if(this.op>.15){ctx.globalAlpha=this.op*.15;ctx.beginPath();ctx.arc(this.x,this.y,this.r*3,0,Math.PI*2);ctx.fillStyle='hsla('+this.hue+',65%,68%,1)';ctx.fill()}
-      ctx.globalAlpha=this.op;ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle='hsla('+this.hue+',65%,68%,1)';ctx.fill();
-      if(ms.speed>4){ctx.globalAlpha=this.op*.3;ctx.beginPath();ctx.arc(this.x-this.vx*2,this.y-this.vy*2,this.r*.6,0,Math.PI*2);ctx.fill()}
-      ctx.globalAlpha=1
-    }
-  }
-  function drawConn(){const mx=110;for(let i=0;i<ps.length;i++){const pi=ps[i],dm=Math.sqrt((pi.x-ms.x)**2+(pi.y-ms.y)**2);if(dm>Math.min(W,H)*.3)continue;for(let j=i+1;j<ps.length;j++){const pj=ps[j],dx=pi.x-pj.x,dy=pi.y-pj.y,d=Math.sqrt(dx*dx+dy*dy);if(d<mx){ctx.globalAlpha=(1-d/mx)*.12;ctx.beginPath();ctx.moveTo(pi.x,pi.y);ctx.lineTo(pj.x,pj.y);ctx.strokeStyle='hsla(278,60%,65%,1)';ctx.lineWidth=.5;ctx.stroke()}}}ctx.globalAlpha=1}
-  function drawGlow(){if(ms.x<0)return;const t=Date.now()*.001,p=1+Math.sin(t*2)*.15;const g=ctx.createRadialGradient(ms.x,ms.y,0,ms.x,ms.y,140*p);g.addColorStop(0,'rgba(157,78,221,.05)');g.addColorStop(.5,'rgba(199,125,255,.025)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(ms.x-170,ms.y-170,340,340)}
-  function burst(x,y){for(let i=0;i<10;i++){const p=ps[Math.floor(Math.random()*ps.length)],a=Math.random()*Math.PI*2,s=Math.random()*5+2;p.x=x;p.y=y;p.vx=Math.cos(a)*s;p.vy=Math.sin(a)*s;p.op=.6}}
-  function loop(){ctx.clearRect(0,0,W,H);ms.speed=Math.sqrt((ms.x-ms.px)**2+(ms.y-ms.py)**2);ms.px=ms.x;ms.py=ms.y;drawGlow();for(const p of ps){p.update();p.draw()}drawConn();requestAnimationFrame(loop)}
-  resize();for(let i=0;i<55;i++)ps.push(new P());
-  document.addEventListener('mousemove',e=>{ms.x=e.clientX;ms.y=e.clientY});
-  document.addEventListener('mousedown',e=>burst(e.clientX,e.clientY));
-  document.addEventListener('mouseleave',()=>{ms.x=-9999;ms.y=-9999});
-  window.addEventListener('resize',resize);loop()
-})();
+/* ═══════════════════════════════════════
+   HERO TITLE CHARACTER ANIMATION
+   ═══════════════════════════════════════ */
+function buildHeroTitle(){
+  const el=document.getElementById('heroTitle');
+  const line1='AI 开发工具';
+  const line2='全景图';
+  let html='';let ci=0;
+  for(const ch of line1){html+=`<span class="char" style="animation-delay:${.5+ci*.06}s">${ch}</span>`;ci++}
+  html+='<br>';
+  for(const ch of line2){html+=`<em class="char" style="animation-delay:${.5+ci*.06}s">${ch}</em>`;ci++}
+  el.innerHTML=html;
+}
 
-/* Three.js Globe */
-(function(){
-  if(typeof THREE==='undefined')return;
-  const container=document.getElementById('globeContainer'),tooltip=document.getElementById('globeTooltip');if(!container)return;
-  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(45,container.clientWidth/container.clientHeight,.1,1000);camera.position.z=3.2;
-  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setSize(container.clientWidth,container.clientHeight);renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));container.appendChild(renderer.domElement);
-  const eg=new THREE.Group();scene.add(eg);
-  const eVS='varying vec3 vN;varying vec3 vP;varying vec2 vU;void main(){vU=uv;vN=normalize(normalMatrix*normal);vP=vec3(modelViewMatrix*vec4(position,1.0));gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}';
-  const eFS='varying vec3 vN;varying vec3 vP;varying vec2 vU;void main(){vec3 oc=vec3(.01,.03,.09);vec3 ld=vec3(.04,.12,.06);float la=vU.y*3.14159;float lo=vU.x*6.28318;float n=sin(lo*3.+.5)*sin(la*2.5-.3)*.5+sin(lo*5.+2.)*sin(la*3.+1.)*.25+sin(lo*8.-1.)*cos(la*4.+.5)*.15;float lm=smoothstep(-.1,.3,n);vec3 b=mix(oc,ld,lm);float gl2=abs(sin(la*18.));float gn=abs(sin(lo*24.));float gr=max(smoothstep(.97,1.,gl2),smoothstep(.97,1.,gn));b=mix(b,vec3(.06,.22,.45),gr*.35);vec3 vd=normalize(-vP);float fr=1.-max(dot(vN,vd),0.);fr=pow(fr,2.5);b+=vec3(.12,.25,.55)*fr*.6;gl_FragColor=vec4(b,.97);}';
-  eg.add(new THREE.Mesh(new THREE.SphereGeometry(1,64,64),new THREE.ShaderMaterial({vertexShader:eVS,fragmentShader:eFS,transparent:true})));
-  const aVS='varying vec3 vN;varying vec3 vP;void main(){vN=normalize(normalMatrix*normal);vP=vec3(modelViewMatrix*vec4(position,1.));gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}';
-  const aFS='varying vec3 vN;varying vec3 vP;void main(){vec3 vd=normalize(-vP);float f=1.-max(dot(vN,vd),0.);f=pow(f,3.);gl_FragColor=vec4(.15,.35,.7,f*.45);}';
-  eg.add(new THREE.Mesh(new THREE.SphereGeometry(1.06,48,48),new THREE.ShaderMaterial({vertexShader:aVS,fragmentShader:aFS,transparent:true,side:THREE.BackSide})));
-  const OPC=80,opG=new THREE.BufferGeometry(),opP=new Float32Array(OPC*3);
-  for(let i=0;i<OPC;i++){const th=Math.random()*Math.PI*2,ph=Math.acos(2*Math.random()-1),r=1.15+Math.random()*.5;opP[i*3]=r*Math.sin(ph)*Math.cos(th);opP[i*3+1]=r*Math.sin(ph)*Math.sin(th);opP[i*3+2]=r*Math.cos(ph)}
-  opG.setAttribute('position',new THREE.BufferAttribute(opP,3));
-  const oPts=new THREE.Points(opG,new THREE.PointsMaterial({size:.025,color:0x8b5cf6,transparent:true,opacity:.5,blending:THREE.AdditiveBlending,depthWrite:false}));eg.add(oPts);
-  function ll2v(lat,lon,r){const phi=(90-lat)*Math.PI/180,theta=(lon+180)*Math.PI/180;return new THREE.Vector3(-r*Math.sin(phi)*Math.cos(theta),r*Math.cos(phi),r*Math.sin(phi)*Math.sin(theta))}
-  const markers=[],mGrp=new THREE.Group();eg.add(mGrp);const mGeo=new THREE.SphereGeometry(.028,12,12);
-  tools.forEach(t=>{if(t.lat===undefined)return;const pos=ll2v(t.lat,t.lon,1.04);const m=new THREE.Mesh(mGeo,new THREE.MeshBasicMaterial({color:new THREE.Color(t.color),transparent:true,opacity:.9}));m.position.copy(pos);m.userData={toolId:t.id};mGrp.add(m);markers.push(m);
-    const rG=new THREE.Mesh(new THREE.RingGeometry(.03,.045,16),new THREE.MeshBasicMaterial({color:new THREE.Color(t.color),transparent:true,opacity:.3,side:THREE.DoubleSide}));rG.position.copy(pos);rG.lookAt(0,0,0);rG.userData={pulse:true};mGrp.add(rG)});
-  let isDrag=false,prevM={x:0,y:0},rY=0,rX=.2,autoRot=true,tRY=0,tRX=.2,autoT=null;
-  const ray=new THREE.Raycaster(),mV=new THREE.Vector2();
-  container.addEventListener('mousedown',e=>{isDrag=true;autoRot=false;prevM={x:e.clientX,y:e.clientY};clearTimeout(autoT)});
-  container.addEventListener('mousemove',e=>{
-    if(isDrag){tRY+=(e.clientX-prevM.x)*.005;tRX+=(e.clientY-prevM.y)*.005;tRX=Math.max(-1.2,Math.min(1.2,tRX));prevM={x:e.clientX,y:e.clientY}}
-    const rect=container.getBoundingClientRect();mV.x=((e.clientX-rect.left)/rect.width)*2-1;mV.y=-((e.clientY-rect.top)/rect.height)*2+1;ray.setFromCamera(mV,camera);
-    const hits=ray.intersectObjects(markers);
-    if(hits.length>0){const t=tools.find(x=>x.id===hits[0].object.userData.toolId);if(t){tooltip.textContent=t.name+' \u2014 '+t.vendor;tooltip.style.left=(e.clientX+14)+'px';tooltip.style.top=(e.clientY-30)+'px';tooltip.style.opacity='1';container.style.cursor='pointer'}}
-    else{tooltip.style.opacity='0';container.style.cursor=isDrag?'grabbing':'grab'}
+/* ═══════════════════════════════════════
+   COUNTER ANIMATION
+   ═══════════════════════════════════════ */
+function animateCounters(){
+  setTimeout(()=>{
+    document.querySelectorAll('.stat-num[data-target]').forEach(el=>{
+      const target=parseInt(el.dataset.target),dur=1800,start=performance.now();
+      function up(now){const p=Math.min((now-start)/dur,1);el.textContent=Math.round(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(up)}
+      requestAnimationFrame(up);
+    });
+  },1600);
+}
+
+/* ═══════════════════════════════════════
+   CARD MOUSE TRACKING (3D tilt + glow)
+   ═══════════════════════════════════════ */
+function bindCardEffects(){
+  document.querySelectorAll('.carousel-card').forEach(card=>{
+    card.addEventListener('mousemove',e=>{
+      const r=card.getBoundingClientRect();
+      const x=((e.clientX-r.left)/r.width*100).toFixed(1);
+      const y=((e.clientY-r.top)/r.height*100).toFixed(1);
+      card.style.setProperty('--mx',x+'%');
+      card.style.setProperty('--my',y+'%');
+      const rX=((e.clientY-r.top)/r.height-.5)*-8;
+      const rY=((e.clientX-r.left)/r.width-.5)*8;
+      card.style.transform=`translateY(-6px) perspective(800px) rotateX(${rX}deg) rotateY(${rY}deg) scale(1.01)`;
+    });
+    card.addEventListener('mouseleave',()=>{card.style.transform=''});
   });
-  container.addEventListener('mouseup',()=>{isDrag=false;autoT=setTimeout(()=>{autoRot=true},3000)});
-  container.addEventListener('mouseleave',()=>{isDrag=false;tooltip.style.opacity='0'});
-  container.addEventListener('click',e=>{const rect=container.getBoundingClientRect();mV.x=((e.clientX-rect.left)/rect.width)*2-1;mV.y=-((e.clientY-rect.top)/rect.height)*2+1;ray.setFromCamera(mV,camera);const hits=ray.intersectObjects(markers);if(hits.length>0){const t=tools.find(x=>x.id===hits[0].object.userData.toolId);if(t)openToolDetail(t.id)}});
-  container.addEventListener('touchstart',e=>{if(e.touches.length===1){isDrag=true;autoRot=false;prevM={x:e.touches[0].clientX,y:e.touches[0].clientY};clearTimeout(autoT)}},{passive:true});
-  container.addEventListener('touchmove',e=>{if(isDrag&&e.touches.length===1){tRY+=(e.touches[0].clientX-prevM.x)*.005;tRX+=(e.touches[0].clientY-prevM.y)*.005;tRX=Math.max(-1.2,Math.min(1.2,tRX));prevM={x:e.touches[0].clientX,y:e.touches[0].clientY}}},{passive:true});
-  container.addEventListener('touchend',()=>{isDrag=false;autoT=setTimeout(()=>{autoRot=true},3000)});
-  const clock=new THREE.Clock();
-  function animate(){requestAnimationFrame(animate);if(autoRot)tRY+=.002;rY+=(tRY-rY)*.08;rX+=(tRX-rX)*.08;eg.rotation.y=rY;eg.rotation.x=rX;
-    const t=clock.getElapsedTime();mGrp.children.forEach(c=>{if(c.userData.pulse){const s=1+Math.sin(t*2.5+c.position.x*10)*.35;c.scale.set(s,s,s);c.material.opacity=.3*(1-Math.sin(t*2.5+c.position.x*10)*.5)}});
-    oPts.rotation.y=t*.08;oPts.rotation.x=Math.sin(t*.15)*.1;renderer.render(scene,camera)}
-  animate();window.addEventListener('resize',()=>{camera.aspect=container.clientWidth/container.clientHeight;camera.updateProjectionMatrix();renderer.setSize(container.clientWidth,container.clientHeight)})
-})();
-
-/* Scroll color */
-(function(){const c=document.getElementById('devCredit');if(!c)return;const l=c.querySelector('.credit-label'),n=c.querySelector('.credit-name');
-  const cs=[{r:199,g:125,b:255},{r:123,g:44,b:191},{r:224,g:170,b:255},{r:157,g:78,b:221},{r:168,g:130,b:255}];
-  function lr(a,b,t){return{r:Math.round(a.r+(b.r-a.r)*t),g:Math.round(a.g+(b.g-a.g)*t),b:Math.round(a.b+(b.b-a.b)*t)}}
-  window.addEventListener('scroll',()=>{const mx=document.documentElement.scrollHeight-window.innerHeight;const p=Math.min(window.scrollY/Math.max(mx,1),1);const sg=cs.length-1,sp=p*sg,si=Math.min(Math.floor(sp),sg-1),st=sp-si;const c2=lr(cs[si],cs[si+1],st);const col='rgb('+c2.r+','+c2.g+','+c2.b+')';if(l)l.style.color=col;if(n)n.style.color=col;if(n)n.style.textShadow='0 0 20px rgba('+c2.r+','+c2.g+','+c2.b+',.35)'},{passive:true})
-})();
-
-/* Author Panel */
-function openAuthorPanel(){document.getElementById('authorOverlay').classList.add('open');document.getElementById('authorPanel').classList.add('open')}
-function closeAuthorPanel(){document.getElementById('authorOverlay').classList.remove('open');document.getElementById('authorPanel').classList.remove('open')}
-
-/* Tool Detail */
-function openToolDetail(id){
-  const t=tools.find(x=>x.id===id);if(!t)return;currentToolId=id;
-  document.getElementById('tdLogo').style.background=t.color;document.getElementById('tdLogo').textContent=t.name.charAt(0);
-  document.getElementById('tdName').textContent=t.name;document.getElementById('tdVendor').textContent=t.vendor;document.getElementById('tdLink').href=t.url;
-  const isFree=t.pricing==='free'||t.pricing==='open-source';
-  document.getElementById('tdPrice').innerHTML=isFree?'<span class="free">'+t.priceLabel+'</span>':'<span>'+t.priceLabel+'</span>';
-  setToolLang(currentToolLang);document.getElementById('toolOverlay').classList.add('open');document.getElementById('toolDetail').classList.add('open')
-}
-function closeToolDetail(){document.getElementById('toolOverlay').classList.remove('open');document.getElementById('toolDetail').classList.remove('open')}
-function setToolLang(lang){
-  currentToolLang=lang;const t=tools.find(x=>x.id===currentToolId);if(!t)return;
-  document.getElementById('langZh').classList.toggle('active',lang==='zh');document.getElementById('langEn').classList.toggle('active',lang==='en');
-  if(lang==='zh'){
-    document.getElementById('tdDescTitle').textContent='\u5de5\u5177\u7b80\u4ecb';document.getElementById('tdTagsTitle').textContent='\u6838\u5fc3\u6807\u7b7e';document.getElementById('tdStrengthsTitle').textContent='\u6838\u5fc3\u4f18\u52bf';document.getElementById('tdCreatorTitle').textContent='\u521b\u4f5c\u8005';
-    document.getElementById('tdDesc').textContent=t.desc;document.getElementById('tdTags').innerHTML=t.tags.map(x=>'<span class="td-tag">'+x+'</span>').join('');
-    document.getElementById('tdStrengths').innerHTML=(t.strengths||[]).map(s=>'<li>'+s+'</li>').join('');document.getElementById('tdCreator').textContent=t.creator||t.vendor;
-    document.getElementById('tdLink').innerHTML='\u8bbf\u95ee\u5b98\u7f51 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>'
-  }else{
-    document.getElementById('tdDescTitle').textContent='Description';document.getElementById('tdTagsTitle').textContent='Tags';document.getElementById('tdStrengthsTitle').textContent='Key Strengths';document.getElementById('tdCreatorTitle').textContent='Creator';
-    document.getElementById('tdDesc').textContent=t.descEn||t.desc;document.getElementById('tdTags').innerHTML=(t.tagsEn||t.tags).map(x=>'<span class="td-tag">'+x+'</span>').join('');
-    document.getElementById('tdStrengths').innerHTML=(t.strengthsEn||t.strengths||[]).map(s=>'<li>'+s+'</li>').join('');document.getElementById('tdCreator').textContent=t.creatorEn||t.creator||t.vendor;
-    document.getElementById('tdLink').innerHTML='Visit <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="14" height="14"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>'
-  }
 }
 
-/* Chat */
-let chatOpen=false;
-function toggleChat(){chatOpen=!chatOpen;document.getElementById('chatWidget').classList.toggle('open',chatOpen);documenat.getElementById('chatToggle').classList.toggle('active',chatOpen);if(chatOpen&&!chatHistory.length)addBotMessage('\u4f60\u597d\uff01\u6211\u662f AI \u5de5\u5177\u52a9\u624b\u3002\u544a\u8bc9\u6211\u4f60\u60f3\u505a\u4ec0\u4e48\uff0c\u6211\u5e2e\u4f60\u627e\u5230\u6700\u5408\u9002\u7684\u5de5\u5177\u3002');if(chatOpen)document.getElementById('chatInput').focus()}
-let chatHistory=[];
-function sendSuggestion(el){document.getElementById('chatInput').value=el.textContent;sendChatMessage()}
-function handleChatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChatMessage()}}
-function sendChatMessage(){const input=document.getElementById('chatInput');const text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';addUserMessage(text);showTyping();setTimeout(()=>{removeTyping();addBotMessage(generateResponse(text))},600+Math.random()*800)}
-function addUserMessage(text){const c=document.getElementById('chatMessages');const d=document.createElement('div');d.className='chat-msg user';d.innerHTML='<div class="chat-msg-avatar">\u4f60</div><div class="chat-msg-bubble"><p>'+esc(text)+'</p></div>';c.appendChild(d);c.scrollTop=c.scrollHeight;document.getElementById('chatSuggestions').style.display='none'}
-function addBotMessage(html){const c=document.getElementById('chatMessages');const d=document.createElement('div');d.className='chat-msg bot';d.innerHTML='<div class="chat-msg-avatar">AI</div><div class="chat-msg-bubble">'+html+'</div>';c.appendChild(d);c.scrollTop=c.scrollHeight;chatHistory.push({role:'bot',content:html})}
-function showTyping(){const c=document.getElementById('chatMessages');const d=document.createElement('div');d.id='typingIndicator';d.className='chat-msg bot';d.innerHTML='<div class="chat-msg-avatar">AI</div><div class="chat-typing"><span class="chat-typing-dot"></span><span class="chat-typing-dot"></span><span class="chat-typing-dot"></span></div>';c.appendChild(d);c.scrollTop=c.scrollHeight}
-function removeTyping(){const el=document.getElementById('typingIndicator');if(el)el.remove()}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function generateResponse(input){
-  const q=input.toLowerCase();
-  if(/^(你好|hi|hello|hey|嗨|哈喽)/.test(q))return'<p>你好！很高兴见到你。告诉我你想做什么，比如建站、写代码、做小程序，我帮你找最合适的工具。</p>';
-  if(/建站|网站|网页|web|前端|html|css/.test(q)){const t=tools.filter(t=>t.category==='website').sort((a,b)=>b.rating-a.rating).slice(0,3);let h='<p>最佳建站工具：</p>';t.forEach((x,i)=>{h+='<p><strong>'+(i+1)+'. '+x.name+'</strong> ('+x.rating+'分) — '+x.desc.substring(0,50)+'... <a href="'+x.url+'" target="_blank">访问</a></p>'});return h}
-  if(/代码|编辑|编程|coding|ide|copilot|cursor/.test(q)){const t=tools.filter(t=>t.category==='code').sort((a,b)=>b.rating-a.rating).slice(0,4);let h='<p>最推荐 AI 代码工具：</p>';t.forEach((x,i)=>{h+='<p><strong>'+(i+1)+'. '+x.name+'</strong> ('+x.rating+'分) <a href="'+x.url+'" target="_blank">访问</a></p>'});return h}
-  if(/应用|app|移动|ios|android|跨平台/.test(q)){const t=tools.filter(t=>t.category==='app').sort((a,b)=>b.rating-a.rating).slice(0,3);let h='<p>应用开发推荐：</p>';t.forEach((x,i)=>{h+='<p><strong>'+(i+1)+'. '+x.name+'</strong> ('+x.rating+'分) <a href="'+x.url+'" target="_blank">访问</a></p>'});return h}
-  if(/小程序|微信|wechat|miniprogram/.test(q)){const t=tools.filter(t=>t.category==='miniapp').sort((a,b)=>b.rating-a.rating);let h='<p>小程序开发工具：</p>';t.forEach((x,i)=>{h+='<p><strong>'+(i+1)+'. '+x.name+'</strong> ('+x.rating+'分) <a href="'+x.url+'" target="_blank">访问</a></p>'});return h}
-  if(/设计|figma|转码|design|ui/.test(q)){const t=tools.filter(t=>t.category==='design').sort((a,b)=>b.rating-a.rating).slice(0,3);let h='<p>设计转码工具：</p>';t.forEach((x,i)=>{h+='<p><strong>'+(i+1)+'. '+x.name+'</strong> ('+x.rating+'分) <a href="'+x.url+'" target="_blank">访问</a></p>'});return h}
-  if(/对话|聊天|chatgpt|claude|gemini|deepseek|通义/.test(q)){const t=tools.filter(t=>t.category==='chat').sort((a,b)=>b.rating-a.rating).slice(0,4);let h='<p>AI 对话工具：</p>';t.forEach((x,i)=>{h+='<p><strong>'+(i+1)+'. '+x.name+'</strong> ('+x.rating+'分, '+x.priceLabel+') <a href="'+x.url+'" target="_blank">访问</a></p>'});return h}
-  if(/免费|free|不要钱|开源/.test(q)){const t=tools.filter(t=>t.pricing==='free'||t.pricing==='open-source').sort((a,b)=>b.rating-a.rating);let h='<p>免费/开源工具 ('+t.length+'个)：</p>';t.forEach(x=>{h+='<p>- <strong>'+x.name+'</strong> <a href="'+x.url+'" target="_blank">访问</a></p>'});return h}
-  if(/对比|比较|最好|最强|排名|推荐|top/.test(q)){const t=[...tools].sort((a,b)=>b.rating-a.rating).slice(0,5);let h='<p>全站 Top 5：</p>';const m=['🥇','🥈','🥉','#4','#5'];t.forEach((x,i)=>{h+='<p>'+m[i]+' <strong>'+x.name+'</strong> ('+x.rating+'分) <a href="'+x.url+'" target="_blank">访问</a></p>'});return h}
-  return'<p>我理解你的问题。本站收录了 <strong>43 款</strong> AI 开发工具，分为 6 大类。你可以问我具体的需求，比如"推荐免费建站工具"或"最好的代码编辑器是什么"。</p>'
+/* ═══════════════════════════════════════
+   RENDER
+   ═══════════════════════════════════════ */
+function getFilteredTools(){
+  return tools.filter(t=>{
+    if(activePrice!=='all'&&t.pricing!==activePrice)return false;
+    if(searchQuery){const q=searchQuery.toLowerCase();return t.name.toLowerCase().includes(q)||t.desc.toLowerCase().includes(q)||t.tags.some(tg=>tg.toLowerCase().includes(q))||t.vendor.toLowerCase().includes(q)}
+    return true;
+  });
 }
-document.getElementById('chatInput').addEventListener('input',function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'});
-
-/* Card Effects */
-function bindCardEffects(){document.querySelectorAll('.carousel-card').forEach(card=>{card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();const x=((e.clientX-r.left)/r.width*100).toFixed(1);const y=((e.clientY-r.top)/r.height*100).toFixed(1);card.style.setProperty('--mx',x+'%');card.style.setProperty('--my',y+'%');const rX=((e.clientY-r.top)/r.height-.5)*-8;const rY=((e.clientX-r.left)/r.width-.5)*8;card.style.transform='translateY(-6px) perspective(800px) rotateX('+rX+'deg) rotateY('+rY+'deg) scale(1.01)'});card.addEventListener('mouseleave',()=>{card.style.transform=''})})}
-
-/* Render */
-function getFilteredTools(){return tools.filter(t=>{if(activePrice!=='all'&&t.pricing!==activePrice)return false;if(searchQuery){const q=searchQuery.toLowerCase();return t.name.toLowerCase().includes(q)||t.desc.toLowerCase().includes(q)||t.tags.some(tg=>tg.toLowerCase().includes(q))||t.vendor.toLowerCase().includes(q)}return true})}
 function sortTools(a){const s=[...a];switch(sortBy){case'rating':s.sort((a,b)=>b.rating-a.rating);break;case'name':s.sort((a,b)=>a.name.localeCompare(b.name));break;case'price-asc':s.sort((a,b)=>a.priceNum-b.priceNum);break;case'price-desc':s.sort((a,b)=>b.priceNum-a.priceNum)}return s}
 function getGlobalRank(t){return[...tools].sort((a,b)=>b.rating-a.rating).findIndex(x=>x.id===t.id)+1}
 
-function cardHTML(tool,rank){
+function cardHTML(tool,rank,idx){
   const rc=rank<=3?(rank===1?'rank-gold':rank===2?'rank-silver':'rank-bronze'):'rank-normal';
-  const ph=tool.pricing==='free'||tool.pricing==='open-source'?'<span class="free">'+tool.priceLabel+'</span>':'<span class="paid">'+tool.priceLabel+'</span>';
-  return '<div class="carousel-card" data-id="'+tool.id+'"><label class="c-compare"><input type="checkbox" class="compare-check" data-compare="'+tool.id+'" '+(compareSet.has(tool.id)?'checked':'')+'/></label><div class="c-top"><div class="c-logo" style="background:'+tool.color+'">'+tool.name.charAt(0)+'</div><div class="c-meta"><div class="c-name">'+tool.name+'</div><div class="c-vendor">'+tool.vendor+'</div></div><span class="c-rank '+rc+'">#'+rank+'</span></div><div class="c-rating"><div class="rating-bar"><div class="rating-fill" data-width="'+(tool.rating/5*100)+'"></div></div><span class="rating-num">'+tool.rating.toFixed(1)+'</span></div><div class="c-desc">'+tool.desc+'</div><div class="c-tags">'+tool.tags.map(t=>'<span class="tag">'+t+'</span>').join('')+'</div><div class="c-bottom"><div class="c-price">'+ph+'</div><a href="'+tool.url+'" target="_blank" rel="noopener" class="c-link">访问<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a></div></div>'
+  const ph=tool.pricing==='free'||tool.pricing==='open-source'?`<span class="free">${tool.priceLabel}</span>`:`<span class="paid">${tool.priceLabel}</span>`;
+  return `<div class="carousel-card" data-id="${tool.id}">
+    <label class="c-compare"><input type="checkbox" class="compare-check" data-compare="${tool.id}" ${compareSet.has(tool.id)?'checked':''}/></label>
+    <div class="c-top">
+      <div class="c-logo" style="background:${tool.color}">${tool.name.charAt(0)}</div>
+      <div class="c-meta"><div class="c-name">${tool.name}</div><div class="c-vendor">${tool.vendor}</div></div>
+      <span class="c-rank ${rc}">#${rank}</span>
+    </div>
+    <div class="c-rating"><div class="rating-bar"><div class="rating-fill" data-width="${tool.rating/5*100}"></div></div><span class="rating-num">${tool.rating.toFixed(1)}</span></div>
+    <div class="c-desc">${tool.desc}</div>
+    <div class="c-tags">${tool.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <div class="c-bottom"><div class="c-price">${ph}</div><a href="${tool.url}" target="_blank" rel="noopener" class="c-link">访问<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg></a></div>
+  </div>`;
 }
 
 function renderAll(){
-  const filtered=getFilteredTools();const container=document.getElementById('categorySections');let html='';let anyResults=false;
+  const filtered=getFilteredTools();
+  const container=document.getElementById('categorySections');
+  let html='';let anyResults=false;
   categories.forEach((cat,ci)=>{
-    const items=sortTools(filtered.filter(t=>t.category===cat.id));if(!items.length)return;anyResults=true;
-    html+='<section class="snap-section category-section" id="sec-'+cat.id+'" data-section="'+(ci+1)+'"><div class="cat-header"><h2>'+cat.label+'</h2><span class="cat-count">'+items.length+' 个工具</span><div class="cat-line"></div></div><div class="carousel-wrap"><div class="carousel" id="carousel-'+cat.id+'">'+items.map(t=>cardHTML(t,getGlobalRank(t))).join('')+'</div></div><div class="carousel-arrows"><button class="arrow-btn" onclick="scrollCarousel(\''+cat.id+'\",-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button><button class="arrow-btn" onclick="scrollCarousel(\''+cat.id+'\",1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button></div></section>'
+    const items=sortTools(filtered.filter(t=>t.category===cat.id));
+    if(!items.length)return;
+    anyResults=true;
+    html+=`<section class="snap-section category-section" id="sec-${cat.id}" data-section="${ci+1}">
+      <div class="cat-header"><h2>${cat.label}</h2><span class="cat-count">${items.length} 个工具</span><div class="cat-line"></div></div>
+      <div class="carousel-wrap">
+        <div class="carousel" id="carousel-${cat.id}">${items.map((t,i)=>cardHTML(t,getGlobalRank(t),i)).join('')}</div>
+      </div>
+      <div class="carousel-arrows">
+        <button class="arrow-btn" onclick="scrollCarousel('${cat.id}',-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="arrow-btn" onclick="scrollCarousel('${cat.id}',1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+    </section>`;
   });
-  container.innerHTML=html;document.getElementById('noResults').classList.toggle('show',!anyResults);
-  bindCardEffects();setTimeout(()=>{document.querySelectorAll('.rating-fill[data-width]').forEach(el=>{el.style.width=el.dataset.width+'%'})},100);
-  buildNavLinks();buildSideNav();initSectionObserver()
+  container.innerHTML=html;
+  document.getElementById('noResults').classList.toggle('show',!anyResults);
+  bindCardEffects();
+  setTimeout(()=>{document.querySelectorAll('.rating-fill[data-width]').forEach(el=>{el.style.width=el.dataset.width+'%'})},100);
+  buildNavLinks();buildSideNav();initSectionObserver();
 }
 
-function scrollCarousel(catId,dir){const el=document.getElementById('carousel-'+catId);if(el)el.scrollBy({left:dir*380,behavior:'smooth'})}
+function scrollCarousel(catId,dir){
+  const el=document.getElementById('carousel-'+catId);
+  if(el)el.scrollBy({left:dir*380,behavior:'smooth'});
+}
 
-function buildNavLinks(){const nav=document.getElementById('navLinks');nav.innerHTML=categories.map((c,i)=>'<a href="#sec-'+c.id+'" class="nav-link" data-idx="'+(i+1)+'">'+c.label+'</a>').join('')+'<button class="nav-cta" onclick="scrollToSection(0)">回到顶部</button>'}
-function buildSideNav(){const sn=document.getElementById('sideNav');sn.innerHTML='<button class="side-dot active" data-label="首页" onclick="scrollToSection(0)"></button>'+categories.map((c,i)=>'<button class="side-dot" data-label="'+c.label+'" onclick="scrollToSection('+(i+1)+')"></button>').join('')}
+function buildNavLinks(){
+  const nav=document.getElementById('navLinks');
+  nav.innerHTML=categories.map((c,i)=>`<a href="#sec-${c.id}" class="nav-link" data-idx="${i+1}">${c.label}</a>`).join('')+
+    `<button class="nav-cta" onclick="scrollToSection(0)">回到顶部</button>`;
+}
+function buildSideNav(){
+  const sn=document.getElementById('sideNav');
+  sn.innerHTML=`<button class="side-dot active" data-label="首页" onclick="scrollToSection(0)"></button>`+
+    categories.map((c,i)=>`<button class="side-dot" data-label="${c.label}" onclick="scrollToSection(${i+1})"></button>`).join('');
+}
 
-function scrollToSection(idx){const all=document.querySelectorAll('.snap-section');if(idx===0&&all[0])all[0].scrollIntoView({behavior:'smooth'});else if(all[idx])all[idx].scrollIntoView({behavior:'smooth'})}
+function scrollToSection(idx){
+  const all=document.querySelectorAll('.snap-section');
+  if(idx===0&&all[0])all[0].scrollIntoView({behavior:'smooth'});
+  else if(all[idx])all[idx].scrollIntoView({behavior:'smooth'});
+}
 
-/* Section Observer */
+/* ═══════════════════════════════════════
+   SECTION OBSERVER
+   ═══════════════════════════════════════ */
 function initSectionObserver(){
   const sections=document.querySelectorAll('.snap-section');
   const obs=new IntersectionObserver(entries=>{
@@ -558,40 +541,50 @@ function initSectionObserver(){
         document.querySelectorAll('.nav-link[data-idx]').forEach(l=>l.classList.toggle('active',l.dataset.idx===String(idx)));
         document.getElementById('floatingFilters').classList.toggle('hidden',idx==='0');
         document.getElementById('mainNav').classList.toggle('scrolled',idx!=='0');
-        e.target.querySelectorAll('.rating-fill[data-width]').forEach(el=>{el.style.width=el.dataset.width+'%'})
+        e.target.querySelectorAll('.rating-fill[data-width]').forEach(el=>{el.style.width=el.dataset.width+'%'});
       }
-    })
+    });
   },{threshold:.5});
-  sections.forEach(s=>obs.observe(s))
+  sections.forEach(s=>obs.observe(s));
 }
 
-/* Compare */
+/* ═══════════════════════════════════════
+   COMPARE
+   ═══════════════════════════════════════ */
 function updateCompare(){
-  const panel=document.getElementById('comparePanel');if(compareSet.size<2){panel.classList.remove('visible');return}
+  const panel=document.getElementById('comparePanel');
+  if(compareSet.size<2){panel.classList.remove('visible');return}
   const sel=[...compareSet].map(id=>tools.find(t=>t.id===id)).filter(Boolean);
-  const rows=[['评分',...sel.map(t=>t.rating.toFixed(1)+' / 5')],['开发商',...sel.map(t=>t.vendor)],['分类',...sel.map(t=>(categories.find(c=>c.id===t.category)||{}).label||'')],['定价',...sel.map(t=>t.priceLabel)],['能力',...sel.map(t=>t.tags.slice(0,3).join(' / '))],['官网',...sel.map(t=>'<a href="'+t.url+'" target="_blank">'+t.name+'</a>')]];
-  document.getElementById('compareTable').innerHTML='<thead><tr><th></th>'+sel.map(t=>'<th>'+t.name+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody>';
-  panel.classList.add('visible')
+  const rows=[['评分',...sel.map(t=>t.rating.toFixed(1)+' / 5')],['开发商',...sel.map(t=>t.vendor)],['分类',...sel.map(t=>categories.find(c=>c.id===t.category)?.label||'')],['定价',...sel.map(t=>t.priceLabel)],['能力',...sel.map(t=>t.tags.slice(0,3).join(' / '))],['官网',...sel.map(t=>`<a href="${t.url}" target="_blank">${t.name}</a>`)]];
+  document.getElementById('compareTable').innerHTML=`<thead><tr><th></th>${sel.map(t=>`<th>${t.name}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>`;
+  panel.classList.add('visible');
 }
 
-/* Events */
+/* ═══════════════════════════════════════
+   EVENTS
+   ═══════════════════════════════════════ */
 function bindEvents(){
   let db;
   document.getElementById('searchInput').addEventListener('input',e=>{clearTimeout(db);db=setTimeout(()=>{searchQuery=e.target.value.trim();renderAll()},200)});
-  document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'&&document.activeElement.tagName!=='TEXTAREA'){e.preventDefault();document.getElementById('searchInput').focus()}});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuthorPanel();closeToolDetail();if(chatOpen)toggleChat()}});
+  document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();document.getElementById('searchInput').focus()}});
   document.getElementById('floatingFilters').addEventListener('click',e=>{const chip=e.target.closest('.ff-chip');if(!chip)return;document.querySelectorAll('.ff-chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');activePrice=chip.dataset.price;renderAll()});
   document.getElementById('sortSelect').addEventListener('change',e=>{sortBy=e.target.value;renderAll()});
   document.getElementById('categorySections').addEventListener('change',e=>{if(!e.target.matches('.compare-check'))return;const id=e.target.dataset.compare;if(e.target.checked){if(compareSet.size>=3){e.target.checked=false;return}compareSet.add(id)}else compareSet.delete(id);updateCompare()});
-  document.getElementById('compareClose').addEventListener('click',()=>{compareSet.clear();document.querySelectorAll('.compare-check').forEach(c=>c.checked=false);updateCompare()})
+  document.getElementById('compareClose').addEventListener('click',()=>{compareSet.clear();document.querySelectorAll('.compare-check').forEach(c=>c.checked=false);updateCompare()});
 }
 
-/* Counter Animation */
-function animateCounters(){setTimeout(()=>{document.querySelectorAll('.stat-num[data-target]').forEach(el=>{const target=parseInt(el.dataset.target),dur=1800,start=performance.now();function up(now){const p=Math.min((now-start)/dur,1);el.textContent=Math.round(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(up)}requestAnimationFrame(up)})},1600)}
-
-/* Init */
-renderAll();bindEvents();animateCounters();
-
+/* ═══════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════ */
+function init(){
+  buildHeroTitle();
+  renderAll();
+  bindEvents();
+  animateCounters();
+  const canvas=document.getElementById('heroCanvas');
+  if(canvas)new HeroParticles(canvas).start();
+}
+document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
